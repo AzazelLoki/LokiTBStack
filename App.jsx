@@ -372,8 +372,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
             </div>
           </div>
         </section>
-        //<div className="px-2 pb-20"><a className="btn-back inline-block" href="https://youtu.be/dQw4w9WgXcQ?si=FdMzGIrH2PNh1LHo" target="_blank" rel="noopener noreferrer">Back</a></div>
-      </div>
+     
       {/* LØKI */}
       <div className="fixed bottom-4 right-4 z-[60] select-none">
         <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle">LØKI</span></div>
@@ -381,4 +380,5 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 

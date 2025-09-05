@@ -112,7 +112,7 @@ function SimpleTable({headers,rows,left,large}){
 function HoverImageHelp({
   src,
   alt = "Help",
-}) { src: string; alt?: string }) {
+}) { src: string; alt? string }) {
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef<HTMLDivElement | null>(null);
 
@@ -431,6 +431,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

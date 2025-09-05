@@ -109,17 +109,14 @@ function SimpleTable({headers,rows,left,large}){
   );
 }
 // -------------------- ToolTip --------------------
-function HoverImageHelp({
-  src,
-  alt = "Help",
-}) { src: string; alt? string }) {
+function HoverImageHelp({ src, alt = "Help" }) {
   const [open, setOpen] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement | null>(null);
+  const ref = React.useRef(null);
 
   React.useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
+    const onDoc = (e) => {
       if (!ref.current) return;
-      if (!ref.current.contains(e.target as Node)) setOpen(false);
+      if (!ref.current.contains(e.target)) setOpen(false);
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -134,7 +131,7 @@ function HoverImageHelp({
         onMouseEnter={() => setOpen(true)}
         onFocus={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        onClick={() => setOpen(v => !v)}
+        onClick={() => setOpen((v) => !v)}
       >
         ?
       </button>
@@ -431,6 +428,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

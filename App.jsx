@@ -219,7 +219,139 @@ export default function TBStackCalculator(){
   const reset=()=>{ setLdrInput(""); setSelected(Object.fromEntries([...GUARDSMEN,...SPECIALISTS].map(k=>[k,false]))); setTypePicks({}); setMonsterFull(Object.fromEntries(MON_GROUPS.map(k=>[k,false]))); setEntryPicks({}); setShowTypePicks(false); setShowEntryPicks(false); setShowCalcs(false); setBubble(null); sfx.deselect(); setToast('Reset done'); setTimeout(()=>setToast(null),1600); try{ document.getElementById('ldr-input')?.focus(); }catch{} window.scrollTo({top:0,behavior:'smooth'}); };
   return (
     <div className="tb-root min-h-screen bg-[#e8ceaa] text-[#5b2a17] relative overflow-x-hidden">
-      <style>{`.animate-glow{animation:glowPulse 1.15s ease-in-out infinite}@keyframes glowPulse{0%{box-shadow:0 0 0 rgba(0,0,0,0)}50%{box-shadow:0 0 18px rgba(186,159,132,.9)}100%{box-shadow:0 0 0 rgba(0,0,0,0)}}.animate-blink{animation:blink 1.15s steps(2,end) infinite}@keyframes blink{50%{opacity:.3}}.tb-close{background:#1f4318;border:2px solid #4d7139;color:#f1debd;border-radius:.5rem;width:2.25rem;height:2.25rem;line-height:2rem;text-align:center;font-size:1.25rem}.btn-back{background:#1f4318;border:2px solid #4d7139;color:#f1debd;padding:.75rem 1.25rem;border-radius:.75rem;font-weight:600;letter-spacing:.02em}.tb-switch{display:inline-flex;align-items:center;gap:.5rem;user-select:none}.tb-toggle{position:relative;width:48px;height:28px;border-radius:9999px;background:#9f7c5e;border:2px solid #4d7139;transition:background .2s ease}.tb-toggle-knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:9999px;background:#f1debd;transition:transform .2s ease}.tb-toggle.on{background:#1f4318}.tb-toggle.on .tb-toggle-knob{transform:translateX(20px)}.tb-slide{overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .25s ease}.tb-slide.open{max-height:9999px;opacity:1}@keyframes shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}@keyframes spark{0%,100%{text-shadow:0 0 8px rgba(255,215,128,.35),0 0 18px rgba(255,215,128,.25)}50%{text-shadow:0 0 18px rgba(255,215,128,.75),0 0 36px rgba(255,215,128,.55)}}.tb-gold{background-image:linear-gradient(90deg,#caa85e,#f5e4a3,#d1a640,#f0d38f,#caa85e);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}.tb-sparkle{animation:shimmer 2.2s linear infinite,spark 1.6s ease-in-out infinite}.tb-chip{background:linear-gradient(90deg,#5b2a17 0%,#6b2417 20%,#80301d 50%,#6b2417 80%,#5b2a17 100%);border:1px solid #5b2a17;border-radius:.75rem;padding:.35rem .6rem;box-shadow:0 6px 18px rgba(128,48,29,.35),inset 0 1px 0 rgba(255,255,255,.12)}.tb-bubble{position:fixed;z-index:90;transform:translate(-50%,calc(-100% - 12px));pointer-events:none}.tb-bubble-inner{background:#f1debd;border:1px solid #4d7139;color:#5b2a17;padding:.5rem .75rem;border-radius:.5rem;font-weight:700;box-shadow:0 8px 18px rgba(159,124,94,.35),inset 0 1px 0 rgba(255,255,255,.25)}.tb-bubble-arrow{position:absolute;bottom:-6px;left:50%;width:12px;height:12px;background:#f1debd;border-left:1px solid #4d7139;border-bottom:1px solid #4d7139;transform:translateX(-50%) rotate(45deg)}.tb-toast{position:fixed;left:1rem;bottom:1rem;z-index:100}.tb-toast-inner{background:#1f4318;color:#f1debd;border:1px solid #4d7139;padding:.5rem .75rem;border-radius:.5rem;font-weight:700;box-shadow:0 8px 18px rgba(31,67,24,.35),inset 0 1px 0 rgba(255,255,255,.15)}.tb-root{scrollbar-width:none;overscroll-behavior:contain}.tb-root::-webkit-scrollbar{width:0;height:0}.tb-icon,.tb-icon-sm{image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;backface-visibility:hidden;transform:translateZ(0)}.tb-icon{filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}.tb-icon-sm{filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}`}</style>
+      <style>{`
+/* =========================
+   1) Animations
+   ========================= */
+.animate-glow { animation: glowPulse 1.15s ease-in-out infinite; }
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+  50% { box-shadow: 0 0 18px rgba(186,159,132,.9); }
+  100% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+}
+.animate-blink { animation: blink 1.15s steps(2,end) infinite; }
+@keyframes blink { 50% { opacity: .3; } }
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes spark {
+  0%,100% { text-shadow: 0 0 8px rgba(255,215,128,.35), 0 0 18px rgba(255,215,128,.25); }
+  50% { text-shadow: 0 0 18px rgba(255,215,128,.75), 0 0 36px rgba(255,215,128,.55); }
+}
+
+/* =========================
+   2) Boutons / Contrôles
+   ========================= */
+.tb-close {
+  background:#1f4318; border:2px solid #4d7139; color:#f1debd;
+  border-radius:.5rem; width:2.25rem; height:2.25rem;
+  line-height:2rem; text-align:center; font-size:1.25rem;
+}
+.btn-back {
+  background:#1f4318; border:2px solid #4d7139; color:#f1debd;
+  padding:.75rem 1.25rem; border-radius:.75rem; font-weight:600; letter-spacing:.02em;
+}
+.tb-chip {
+  background:linear-gradient(90deg,#5b2a17 0%,#6b2417 20%,#80301d 50%,#6b2417 80%,#5b2a17 100%);
+  border:1px solid #5b2a17; border-radius:.75rem; padding:.35rem .6rem;
+  box-shadow:0 6px 18px rgba(128,48,29,.35), inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+/* =========================
+   3) Switch / Toggle
+   ========================= */
+.tb-switch { display:inline-flex; align-items:center; gap:.5rem; user-select:none; }
+.tb-toggle {
+  position:relative; width:48px; height:28px; border-radius:9999px;
+  background:#9f7c5e; border:2px solid #4d7139; transition:background .2s ease;
+}
+.tb-toggle-knob {
+  position:absolute; top:2px; left:2px; width:22px; height:22px;
+  border-radius:9999px; background:#f1debd; transition:transform .2s ease;
+}
+.tb-toggle.on { background:#1f4318; }
+.tb-toggle.on .tb-toggle-knob { transform:translateX(20px); }
+
+/* =========================
+   4) Panneaux coulissants
+   ========================= */
+.tb-slide {
+  overflow:hidden; max-height:0; opacity:0;
+  transition:max-height .35s ease, opacity .25s ease;
+}
+.tb-slide.open {
+  max-height:9999px; opacity:1; overflow:visible; /* correction: pas de coupe à 1000px */
+}
+
+/* =========================
+   5) Effets texte or / scintillant
+   ========================= */
+.tb-gold{
+  background-image:linear-gradient(90deg,#caa85e,#f5e4a3,#d1a640,#f0d38f,#caa85e);
+  background-size:200% 100%;
+  -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+}
+.tb-sparkle{ animation:shimmer 2.2s linear infinite, spark 1.6s ease-in-out infinite; }
+
+/* =========================
+   6) Bulles / Toast
+   ========================= */
+.tb-bubble {
+  position:fixed; z-index:90;
+  transform:translate(-50%, calc(-100% - 12px)); pointer-events:none;
+}
+.tb-bubble-inner {
+  background:#f1debd; border:1px solid #4d7139; color:#5b2a17;
+  padding:.5rem .75rem; border-radius:.5rem; font-weight:700;
+  box-shadow:0 8px 18px rgba(159,124,94,.35), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.tb-bubble-arrow {
+  position:absolute; bottom:-6px; left:50%; width:12px; height:12px; background:#f1debd;
+  border-left:1px solid #4d7139; border-bottom:1px solid #4d7139;
+  transform:translateX(-50%) rotate(45deg);
+}
+.tb-toast { position:fixed; left:1rem; bottom:1rem; z-index:100; }
+.tb-toast-inner {
+  background:#1f4318; color:#f1debd; border:1px solid #4d7139;
+  padding:.5rem .75rem; border-radius:.5rem; font-weight:700;
+  box-shadow:0 8px 18px rgba(31,67,24,.35), inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* =========================
+   7) Root / Scroll
+   ========================= */
+.tb-root { scrollbar-width:none; overscroll-behavior:contain; }
+.tb-root::-webkit-scrollbar { width:0; height:0; }
+
+/* =========================
+   8) Icônes / Images
+   ========================= */
+.tb-icon, .tb-icon-sm {
+  image-rendering:-webkit-optimize-contrast; image-rendering:crisp-edges;
+  backface-visibility:hidden; transform:translateZ(0);
+}
+.tb-icon { filter:drop-shadow(0 1px 1px rgba(0,0,0,.15)); }
+.tb-icon-sm { filter:drop-shadow(0 1px 1px rgba(0,0,0,.12)); }
+
+/* =========================
+   9) Aide (Section 2)
+   ========================= */
+.tb-help{
+  width:28px; height:28px; border-radius:9999px;
+  background:#1f4318; border:2px solid #4d7139; color:#f1debd;
+  font-weight:700; line-height:24px; text-align:center;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.tb-help:hover{ filter:brightness(1.05); }
+.tb-pop{
+  position:absolute; top:110%; left:0; z-index:60;
+  background:#f1debd; border:1px solid #9f7c5e; padding:.5rem;
+  border-radius:.75rem; box-shadow:0 6px 18px rgba(0,0,0,.15);
+}
+`}</style>
+
       {bubble && (
         <div className="tb-bubble" style={{top:bubble.y,left:bubble.x}} role="alert" aria-live="polite">
           <div className="tb-bubble-inner">Enter a value for TOTAL LEADERSHIP first</div>
@@ -428,6 +560,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

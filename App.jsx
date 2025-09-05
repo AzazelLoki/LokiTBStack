@@ -108,6 +108,56 @@ function SimpleTable({headers,rows,left,large}){
     </table>
   );
 }
+// -------------------- ToolTip --------------------
+function HoverImageHelp({
+  src,
+  alt = "Help",
+}: { src: string; alt?: string }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (!ref.current) return;
+      if (!ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative inline-block align-middle ml-2">
+      <button
+        type="button"
+        aria-label="Help"
+        className="tb-help"
+        onMouseEnter={() => setOpen(true)}
+        onFocus={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen(v => !v)}
+      >
+        ?
+      </button>
+
+      {open && (
+        <div
+          className="tb-pop"
+          role="tooltip"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          <img
+            src={src}
+            alt={alt}
+            className="max-w-[70vw] md:max-w-md h-auto block rounded-xl shadow"
+            crossOrigin="anonymous"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 // -------------------- App --------------------
 export default function TBStackCalculator(){
   const sfx=useTBSfx();
@@ -381,6 +431,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

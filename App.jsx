@@ -372,6 +372,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
             </div>
           </div>
         </section>
+        <div className="px-2 pb-20"><a className="btn-back inline-block" href="https:tbstack.vercel.app" target="_blank" rel="noopener noreferrer">Back</a></div>
       </div>
       {/* LØKI */}
       <div className="fixed bottom-4 right-4 z-[60] select-none">
@@ -380,5 +381,6 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 

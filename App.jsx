@@ -190,7 +190,7 @@ export default function TBStackCalculator(){
             <div className="max-w-6xl mx-auto flex items-center justify-between py-3 px-4">
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl md:text-3xl tracking-wide text-[#f1debd]" style={glow}>TB - STACK CALCULATOR</h1>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#1f4318] border border-[#4d7139] text-[#f1debd] text-sm font-semibold leading-none">V0,6</span>
+                <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#1f4318] border border-[#4d7139] text-[#f1debd] text-sm font-semibold leading-none">V0,7</span>
               </div>
               <button className="tb-close" aria-label="Reset all" title="Reset all" onClick={reset}>×</button>
             </div>
@@ -381,6 +381,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

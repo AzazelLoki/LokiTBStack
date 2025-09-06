@@ -110,29 +110,51 @@ function SimpleTable({headers,rows,left,large}){
   );
 }
 // -------------------- ToolTip --------------------
+function useIsTouch(){
+  const [isTouch, setIsTouch] = React.useState(false);
+  React.useEffect(() => {
+    const mq = window.matchMedia?.("(hover: none)");
+    const hasTouch = "ontouchstart" in window || (mq && mq.matches);
+    setIsTouch(!!hasTouch);
+    const onChange = (e) => setIsTouch(!!e.matches);
+    mq?.addEventListener?.("change", onChange);
+    return () => mq?.removeEventListener?.("change", onChange);
+  }, []);
+  return isTouch;
+}
+
 function HoverImageHelp({ src, alt = "Help" }) {
+  const isTouch = useIsTouch();
   const [open, setOpen] = React.useState(false);
   const ref = React.useRef(null);
 
+  // Fermer en cliquant/touchant hors du popover (mobile & desktop)
   React.useEffect(() => {
     const onDoc = (e) => {
       if (!ref.current) return;
       if (!ref.current.contains(e.target)) setOpen(false);
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("pointerdown", onDoc, { passive: true });
+    return () => document.removeEventListener("pointerdown", onDoc);
   }, []);
 
   return (
-    <div ref={ref} className="relative inline-block align-middle ml-2">
+    <div
+      ref={ref}
+      className="relative inline-block align-middle ml-2"
+      // Hover seulement sur desktop
+      onMouseEnter={!isTouch ? () => setOpen(true) : undefined}
+      onMouseLeave={!isTouch ? () => setOpen(false) : undefined}
+    >
       <button
         type="button"
         aria-label="Help"
+        aria-expanded={open}
         className="tb-help"
-        onMouseEnter={() => setOpen(true)}
-        onFocus={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onClick={() => setOpen((v) => !v)}
+        // Sur mobile: toggle; sur desktop: click force l'ouverture
+        onClick={() => setOpen(v => (isTouch ? !v : true))}
+        onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+        style={{ touchAction: "manipulation" }}  // réduit les latences sur mobile
       >
         ?
       </button>
@@ -141,14 +163,23 @@ function HoverImageHelp({ src, alt = "Help" }) {
         <div
           className="tb-pop"
           role="tooltip"
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
+          // Ne pas propager le pointerdown vers le document (sinon fermeture immédiate)
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <img
             src={src}
             alt={alt}
             className="block rounded-xl shadow w-auto h-auto max-w-[92vw] sm:max-w-md"
-          
+            // Fallback auto pour les URLs GitHub -> raw.githubusercontent.com
+            onError={(e) => {
+              const el = e.currentTarget;
+              if (el.dataset.tried) return;
+              el.dataset.tried = "1";
+              el.src = el.src
+                .replace("github.com/", "raw.githubusercontent.com/")
+                .replace("/blob/", "/")
+                .replace("?raw=true", "");
+            }}
           />
         </div>
       )}
@@ -619,6 +650,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

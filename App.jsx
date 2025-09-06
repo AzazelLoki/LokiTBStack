@@ -507,7 +507,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
         {/* S/G Results */}
         <section className={`${clsPanel} mx-2`}>
           <h2 className="text-lg mb-3" style={glow}>SPECIALISTS / GUARDSMEN RESULT</h2>
-          <div className="flex items-center gap-3 mb-2 tb-switch"><span style={glow} className="text-sm opacity-80">S/G Build view</span><button type="button" role="switch" aria-checked={showSGBuild} className={`tb-toggle ${showSGBuild?'on':''}`} onClick={()=>setShowSGBuild(v=>!v)}><span className="tb-toggle-knob"/></button></div>
+          <div className="flex items-center gap-3 mb-2 tb-switch"><span style={glow} className="text-sm opacity-80">S/G Buy view</span><button type="button" role="switch" aria-checked={showSGBuild} className={`tb-toggle ${showSGBuild?'off':''}`} onClick={()=>setShowSGBuild(v=>!v)}><span className="tb-toggle-knob"/></button></div>
           <div className={`tb-slide ${showSGBuild? 'open':''}`}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -586,6 +586,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

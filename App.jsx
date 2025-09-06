@@ -59,7 +59,7 @@ const MONSTER_ICONS = {
   "Devastator I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Devastator%20I.png?raw=true",
   "Fire Phoenix I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Fire%20Phoenix%20I.png?raw=true",
   "Kraken I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Kraken%20I.png?raw=true",
-  "Trickster I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true"
+  "Trickster I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true",
   "Leadership": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/Leadership.png?raw=true"
 };
 // MERCENAIRES (type|strength|health|ldr)
@@ -577,6 +577,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

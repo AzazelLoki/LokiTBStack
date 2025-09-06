@@ -227,7 +227,30 @@ export default function TBStackCalculator(){
   const hasLeadership=L>0;
   const [bubble,setBubble]=useState(null); const [toast,setToast]=useState(null);
   useEffect(()=>{ if(!bubble) return; const t=setTimeout(()=>setBubble(null),1800); return ()=>clearTimeout(t); },[bubble]);
-  const blocked=(ev)=>{ if(hasLeadership) return; const r=ev.currentTarget.getBoundingClientRect(); setBubble({x:r.left+r.width/2,y:r.top,text:'Enter a value for TOTAL LEADERSHIP first'}); sfx.deselect(); };
+const blocked = (ev) => {
+  if (hasLeadership) return;
+
+  const r = ev.currentTarget.getBoundingClientRect();
+  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  const M = 16; // marge de sécurité des bords
+
+  // Centre horizontal + clamp dans l’écran
+  let x = r.left + r.width / 2;
+  x = Math.min(Math.max(x, M), vw - M);
+
+  // On préfère au-dessus ; si trop près du haut, on bascule en dessous
+  const flip = r.top < 64; // seuil (px)
+  const y = flip ? (r.bottom + 12) : r.top;
+
+  setBubble({
+    x,
+    y,
+    pos: flip ? 'bottom' : 'top',
+    text: 'Enter a value for TOTAL LEADERSHIP first'
+  });
+  sfx.deselect();
+};
+
 const monstersRows=useMemo(()=>{ 
   if(!anchors.Imerc) return []; 
   const out=[]; 
@@ -383,6 +406,22 @@ const monstersRowsSorted = useMemo(
   padding:.5rem .75rem; border-radius:.5rem; font-weight:700;
   box-shadow:0 8px 18px rgba(31,67,24,.35), inset 0 1px 0 rgba(255,255,255,.15);
 }
+/* Empêche les bulles trop larges de dépasser */
+.tb-bubble-inner { max-width: min(92vw, 340px); }
+
+/* Quand on doit l'afficher EN DESSOUS du bouton */
+.tb-bubble--bottom {
+  transform: translate(-50%, 12px); /* au lieu de -100% (au-dessus) */
+}
+
+/* Flèche orientée pour la version "bottom" */
+.tb-bubble-arrow--bottom {
+  top: -6px;
+  bottom: auto;
+  border-left: 1px solid #4d7139;
+  border-top: 1px solid #4d7139;
+  border-bottom: none;
+}
 
 /* =========================
    7) Root / Scroll
@@ -426,17 +465,18 @@ const monstersRowsSorted = useMemo(
 }
 `}</style>
 
-      {bubble && (
-        <div className="tb-bubble" style={{top:bubble.y,left:bubble.x}} role="alert" aria-live="polite">
-          <div className="tb-bubble-inner">Enter a value for TOTAL LEADERSHIP first</div>
-          <span className="tb-bubble-arrow"/>
-        </div>
-      )}
-      {toast && (
-        <div className="tb-toast" role="status" aria-live="polite">
-          <div className="tb-toast-inner">Reset done</div>
-        </div>
-      )}
+{bubble && (
+  <div
+    className={`tb-bubble ${bubble.pos === 'bottom' ? 'tb-bubble--bottom' : ''}`}
+    style={{ top: bubble.y, left: bubble.x }}
+    role="alert"
+    aria-live="polite"
+  >
+    <div className="tb-bubble-inner">{bubble.text}</div>
+    <span className={`tb-bubble-arrow ${bubble.pos === 'bottom' ? 'tb-bubble-arrow--bottom' : ''}`} />
+  </div>
+)}
+
       <div className="max-w-6xl mx-auto space-y-6 relative">
         <header className="fixed top-0 left-0 right-0 z-[120]">
           <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-[linear-gradient(90deg,#5b2a17_0%,#6b2417_20%,#80301d_50%,#6b2417_80%,#5b2a17_100%)] border-t border-[#5b2a17] shadow-[0_6px_20px_rgba(128,48,29,0.45),inset_0_1px_0_rgba(255,255,255,0.08)]">
@@ -650,6 +690,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

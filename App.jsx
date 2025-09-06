@@ -518,17 +518,17 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     <div>
       <h3 className="font-semibold mb-3" style={glow}>Monsters</h3>
       {monstersRows.length ? (
-        <SimpleTable
-          left
-          headers={["Group","Name","Image","Count"]}
-          rows={monstersRows.map(m => {
-            const imgSrc = MONSTER_ICONS[m.name] || null;
-            const imgTag = imgSrc ? (
-              <img src={imgSrc} alt={m.name} className="tb-icon-sm w-[96px] h-[96px] rounded-lg object-contain mx-auto" />
-            ) : "—";
-            return [m.group,m.name,imgTag,m.count];
-          })}
-        />
+<SimpleTable
+  left
+  headers={["Group","Name","Image","Count"]}
+  rows={monstersRowsSorted.map(m => {
+    const imgSrc = MONSTER_ICONS[m.name] || null;
+    const imgTag = imgSrc ? (
+      <img src={imgSrc} alt={m.name} className="tb-icon-sm w-[96px] h-[96px] rounded-lg object-contain mx-auto" />
+    ) : "—";
+    return [m.group, m.name, imgTag, m.count];
+  })}
+/>
       ) : (
         <div className="opacity-70">No monster rows yet.</div>
       )}
@@ -619,6 +619,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

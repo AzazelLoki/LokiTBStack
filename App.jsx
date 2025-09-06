@@ -1,6 +1,7 @@
 
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 // v07c (compact, fixed):
 // • Conserve visuel + comportements
 // • Réduction de lignes via composants factorisés & data CSV → objetsbuy
@@ -688,8 +689,12 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
         <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle">LØKI</span></div>
       </div>
     </div>
+     {/* Vercel Web Analytics  */}
+      <Analytics />
+    </div>  {/* ← fermeture du .tb-root */}
   );
 }
+
 
 
 

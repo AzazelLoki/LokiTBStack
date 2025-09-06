@@ -394,10 +394,10 @@ export default function TBStackCalculator(){
   </span>
 
   {/* utilise ta map d’icônes */}
-  {MONSTER_ICONS["Trickster I"] && (
+  {MONSTER_ICONS["Leadership"] && (
     <HoverImageHelp
-      src={MONSTER_ICONS["Trickster I"]}
-      alt="Trickster I"
+      src={MONSTER_ICONS["Leadership"]}
+      alt="Leadership"
     />
   )}
 </div>
@@ -577,6 +577,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

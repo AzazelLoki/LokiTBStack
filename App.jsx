@@ -60,6 +60,7 @@ const MONSTER_ICONS = {
   "Fire Phoenix I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Fire%20Phoenix%20I.png?raw=true",
   "Kraken I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Kraken%20I.png?raw=true",
   "Trickster I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true"
+  "Leadership": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/Leadership.png?raw=true"
 };
 // MERCENAIRES (type|strength|health|ldr)
 const MERC_CSV = "mercs-monsters-melee|410000|1230000|11;mercs-monsters-flying|690000|2070000|6;mercs-monsters-mounted|470000|1410000|9;mercs-monsters-ranged|440000|1320000|10;mercs-specialists-melee|11000|33000|409;mercs-specialists-flying|220000|660000|20;mercs-specialists-mounted|22000|66000|204;mercs-specialists-ranged|11000|33000|409;merc-guards-melee|11000|33000|409;merc-guards-flying|220000|660000|20;merc-guards-mounted|22000|66000|204;merc-guards-ranged|11000|33000|409;merc-cannon|55000|330000|23;merc-hunter|25000|75000|22;";
@@ -576,6 +577,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

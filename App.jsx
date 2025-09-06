@@ -18,7 +18,7 @@ const fmtInt = (n)=> (Number.isFinite(n)? Math.floor(n).toLocaleString():"0");
 const parseNumber=(x)=>{ if(typeof x!=="string") return Number(x)||0; const n=Number(x.replace(/[^0-9.,]/g,"").replace(",",".")); return Number.isFinite(n)?n:0; };
 // -------------------- Données compactes → objets --------------------
 // SG (tier|type|health|ldr)
-const SG_CSV = "G2|ranged|270|1;G2|melee|270|1;G2|mounted|540|2;G3|ranged|480|1;G3|melee|480|1;G3|mounted|960|2;G4|ranged|870|1;G4|melee|870|1;G4|mounted|1740|2;G5|ranged|1560|1;G5|melee|1560|1;G5|mounted|3150|2;G5|flying|30000|20;G6|ranged|2820|1;G6|melee|2820|1;G6|mounted|5700|2;G6|flying|57000|20;G7|ranged|5100|1;G7|melee|5100|1;G7|mounted|10200|2;G7|flying|102000|20;G8|ranged|9180|1;G8|melee|9180|1;G8|mounted|18360|2;G8|flying|183600|20;G9|ranged|16530|1;G9|melee|16530|1;G9|mounted|33060|2;G9|flying|330600|20;S3|melee|480|1;S3|scout|240|5;S4|melee|870|1;S4|scout|450|5;S5|ranged|1560|1;S5|melee|1560|1;S5|mounted|3150|2;S5|flying|1560|1;S6|ranged|2820|1;S6|melee|2820|1;S6|mounted|5700|2;S6|flying|2820|1;S7|ranged|5100|1;S7|melee|5100|1;S7|mounted|10200|2;S7|flying|5100|1;S8|ranged|9180|1;S8|melee|9180|1;S8|mounted|18360|2;S8|flying|9180|20;S9|ranged|16530|1;S9|melee|16530|1;S9|mounted|33060|2;S9|flying|16530|20;";
+const SG_CSV = "G2|ranged|270|1;G2|melee|270|1;G2|mounted|540|2;G3|ranged|480|1;G3|melee|480|1;G3|mounted|960|2;G4|ranged|870|1;G4|melee|870|1;G4|mounted|1740|2;G5|ranged|1560|1;G5|melee|1560|1;G5|mounted|3150|2;G5|flying|30000|20;G6|ranged|2820|1;G6|melee|2820|1;G6|mounted|5700|2;G6|flying|57000|20;G7|ranged|5100|1;G7|melee|5100|1;G7|mounted|10200|2;G7|flying|102000|20;G8|ranged|9180|1;G8|melee|9180|1;G8|mounted|18360|2;G8|flying|183600|20;G9|ranged|16530|1;G9|melee|16530|1;G9|mounted|33060|2;G9|flying|330600|20;S3|melee|480|1;S3|scout|240|5;S4|melee|870|1;S4|scout|450|5;S5|ranged|1560|1;S5|melee|1560|1;S5|mounted|3150|2;S5|flying|1560|1;S6|ranged|2820|1;S6|melee|2820|1;S6|mounted|5700|2;S6|flying|2820|1;S7|ranged|5100|1;S7|melee|5100|1;S7|mounted|10200|2;S7|flying|5100|1;S8|ranged|9180|1;S8|melee|9180|1;S8|mounted|18360|2;S8|flying|183600|20;S9|ranged|16530|1;S9|melee|16530|1;S9|mounted|33060|2;S9|flying|330600|20;";
 const DATA = {}; SG_CSV.split(';').filter(Boolean).forEach(r=>{ const [tier,type,h,l]=r.split('|'); (DATA[tier] ||= []).push({type,health:+h,ldr:+l}); });
 const SPECIALISTS = ["S3","S4","S5","S6","S7","S8","S9"]; const GUARDSMEN=["G2","G3","G4","G5","G6","G7","G8","G9"]; const ORDER=[...GUARDSMEN,...SPECIALISTS].sort((a,b)=>{const mh=(k)=>Math.min(...DATA[k].map(u=>u.health)); const [ha,hb]=[mh(a),mh(b)]; return ha===hb? a.localeCompare(b):ha-hb;});
 // Strengths SG (tier|type|strength)
@@ -586,6 +586,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

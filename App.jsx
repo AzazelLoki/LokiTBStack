@@ -209,7 +209,7 @@ export default function TBStackCalculator(){
   const mercTotals=useMemo(()=>({ count: mercRowsNZ.reduce((a,r)=>a+r.count,0), hp: mercRowsNZ.reduce((a,r)=>a+r.totalHealth,0), str: mercRowsNZ.reduce((a,r)=>a+r.totalStrength,0) }),[mercRowsNZ]);
   const [showTypePicks,setShowTypePicks]=useState(false);
   const [showEntryPicks,setShowEntryPicks]=useState(false);
-  const [showSGBuild,setShowSGBuild]=useState(true);
+  const [showSGBuild,setShowSGBuild]=useState(false);
   const [showCalcs,setShowCalcs]=useState(false);
   // -------------------- Tests rapides (ne modifient rien à l'UI) --------------------
   useEffect(()=>{
@@ -586,6 +586,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

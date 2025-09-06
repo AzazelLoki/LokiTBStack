@@ -383,7 +383,7 @@ export default function TBStackCalculator(){
             {L<=0? (
               <div className={`uppercase ${!ldrInput.trim()? 'animate-blink':''} text-sm sm:text-base md:text-lg w-full md:w-[26rem] whitespace-nowrap`} style={glow}>ENTER YOUR TOTAL LEADERSHIP BELOW.</div>
             ) : (
-              <h2 className="text-lg" style={glow}>TOTAL LEADERSHIP <HoverImageHelp src="https://raw.githubusercontent.com/AzazelLoki/TB-Stack/main/Monster%20Icon/M6-Crystal%20Dragon.png" alt="Aide leadership"/></h2>
+              <h2 className="text-lg" style={glow}>TOTAL LEADERSHIP <HoverImageHelp src="https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true" alt="Aide leadership"/></h2>
             )}
             <input id="ldr-input" className={`bg-[#f1debd] text-[#5b2a17] border rounded px-5 py-4 w-full md:w-[26rem] text-2xl md:text-3xl focus:outline-none ${!ldrInput.trim()? 'border-[#80301d] animate-glow':'border-[#9f7c5e]'}`} placeholder="E.G. 125000" value={ldrInput} onChange={e=>setLdrInput(e.target.value)} inputMode="numeric" onFocus={()=>sfx.select()} />
             {L>0 && !Object.values(selected).some(Boolean)? (<div className="text-base md:text-lg font-semibold animate-blink" style={glow}>↓ choose tiers below ↓</div>): null}
@@ -560,6 +560,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

@@ -197,9 +197,42 @@ export default function TBStackCalculator(){
   const [bubble,setBubble]=useState(null); const [toast,setToast]=useState(null);
   useEffect(()=>{ if(!bubble) return; const t=setTimeout(()=>setBubble(null),1800); return ()=>clearTimeout(t); },[bubble]);
   const blocked=(ev)=>{ if(hasLeadership) return; const r=ev.currentTarget.getBoundingClientRect(); setBubble({x:r.left+r.width/2,y:r.top,text:'Enter a value for TOTAL LEADERSHIP first'}); sfx.deselect(); };
-  const monstersRows=useMemo(()=>{ if(!anchors.Imerc) return []; const out=[]; const apply=(group,I)=>{ if(!group) return; const picks=entryPicks[group]; const idxs=picks?.size? Array.from(picks): MONSTERS[group].map((_,i)=>i); idxs.forEach(i=>{ const u=MONSTERS[group][i]; const n=Math.floor((I||0)/u.health); out.push({group,type:u.type,name:u.name,count:n,totalHealth:n*u.health,unitStrength:u.strength,unitHealth:u.health,totalStrength:n*u.strength}); }); };
-    fullSelectedOrdered.forEach((g,i)=> apply(g, anchors.Imerc * CONSTS.s ** (1+i)) );
-    return out; },[anchors,fullSelectedOrdered.join(','),picksSignature,entryPicks]);
+const monstersRows=useMemo(()=>{ 
+  if(!anchors.Imerc) return []; 
+  const out=[]; 
+  const apply=(group,I)=>{ 
+    if(!group) return; 
+    const picks=entryPicks[group]; 
+    const idxs=picks?.size? Array.from(picks): MONSTERS[group].map((_,i)=>i); 
+    idxs.forEach(i=>{ 
+      const u=MONSTERS[group][i]; 
+      const n=Math.floor((I||0)/u.health); 
+      out.push({
+        group,
+        type:u.type,
+        name:u.name,
+        count:n,
+        totalHealth:n*u.health,
+        unitStrength:u.strength,
+        unitHealth:u.health,
+        totalStrength:n*u.strength
+      }); 
+    }); 
+  };
+  fullSelectedOrdered.forEach((g,i)=> apply(g, anchors.Imerc * CONSTS.s ** (1+i)) );
+  return out; 
+},[anchors,fullSelectedOrdered.join(','),picksSignature,entryPicks]);
+
+// 🔽 AJOUT : tri décroissant par santé (HP unitaire), puis HP total, puis nom
+const monstersRowsSorted = useMemo(
+  () => [...monstersRows].sort(
+    (a,b) =>
+      b.unitHealth - a.unitHealth ||     // 1) HP unitaire décroissant
+      b.totalHealth - a.totalHealth ||   // 2) puis HP total décroissant
+      a.name.localeCompare(b.name)       // 3) puis nom (stabilité)
+  ),
+  [monstersRows]
+);
   const mercRows=useMemo(()=> !anchors.Imerc? []: MERCS.map(u=>{ const cannon=u.type==="merc-cannon"||u.type==="merc-hunter"; const I=cannon? anchors.Icannon: anchors.Imerc; const n=Math.floor(I/u.health); return {...u,count:n,totalHealth:n*u.health,totalStrength:n*u.strength}; }),[anchors]);
   const hasMercResults=useMemo(()=> mercRows.some(r=>r.count>0),[mercRows]);
   const mercRowsNZ=useMemo(()=> mercRows.filter(r=>r.count>0),[mercRows]);
@@ -586,6 +619,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

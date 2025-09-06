@@ -689,11 +689,12 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
         <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle">LØKI</span></div>
       </div>
     </div>
-     {/* Vercel Web Analytics  */}
+   
       <Analytics />
-    </div>  {/* ← fermeture du .tb-root */}
+    </div>  
   );
 }
+
 
 
 

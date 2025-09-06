@@ -147,7 +147,7 @@ function HoverImageHelp({ src, alt = "Help" }) {
             src={src}
             alt={alt}
             className="max-w-[70vw] md:max-w-md h-auto block rounded-xl shadow"
-            crossOrigin="anonymous"
+          
           />
         </div>
       )}
@@ -576,6 +576,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

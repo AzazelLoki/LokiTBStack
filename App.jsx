@@ -380,11 +380,27 @@ export default function TBStackCalculator(){
         {/* Leadership */}
         <div className="px-2">
           <div className="mb-4 flex flex-col items-start gap-2">
-            {L<=0? (
-              <div className={`uppercase ${!ldrInput.trim()? 'animate-blink':''} text-sm sm:text-base md:text-lg w-full md:w-[26rem] whitespace-nowrap`} style={glow}>ENTER YOUR TOTAL LEADERSHIP BELOW.</div>
-            ) : (
-              <h2 className="text-lg" style={glow}>TOTAL LEADERSHIP <HoverImageHelp src="https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true" alt="Aide leadership"/></h2>
-            )}
+            <div className="flex items-center gap-2">
+  <span
+    className={
+      L <= 0
+        ? `uppercase ${!ldrInput.trim() ? "animate-blink" : ""} text-sm sm:text-base md:text-lg whitespace-nowrap`
+        : "text-lg"
+    }
+    style={glow}
+  >
+    {L <= 0 ? "ENTER YOUR TOTAL LEADERSHIP BELOW." : "TOTAL LEADERSHIP"}
+  </span>
+
+  {/* utilise ta map d’icônes */}
+  {MONSTER_ICONS["Trickster I"] && (
+    <HoverImageHelp
+      src={MONSTER_ICONS["Trickster I"]}
+      alt="Trickster I"
+    />
+  )}
+</div>
+
             <input id="ldr-input" className={`bg-[#f1debd] text-[#5b2a17] border rounded px-5 py-4 w-full md:w-[26rem] text-2xl md:text-3xl focus:outline-none ${!ldrInput.trim()? 'border-[#80301d] animate-glow':'border-[#9f7c5e]'}`} placeholder="E.G. 125000" value={ldrInput} onChange={e=>setLdrInput(e.target.value)} inputMode="numeric" onFocus={()=>sfx.select()} />
             {L>0 && !Object.values(selected).some(Boolean)? (<div className="text-base md:text-lg font-semibold animate-blink" style={glow}>↓ choose tiers below ↓</div>): null}
           </div>
@@ -560,6 +576,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

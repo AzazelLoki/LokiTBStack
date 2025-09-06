@@ -417,14 +417,14 @@ export default function TBStackCalculator(){
         </div>
         {/* S/G */}
         <section className={`${clsPanel} mx-2`}>
-          <h2 className="text-lg mb-3" style={glow}>SPECIALISTS / GUARDSMEN</h2>
+          <h2 className="text-lg mb-3" style={glow}>GUARDSMEN / SPECIALISTS</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Buttons title="SPECIALISTS (S3–S9)" leadingBlank={1} compact
-              options={SPECIALISTS.map(k=>({key:k,text:k,on:!!selected[k]}))}
-              onClick={(k)=> setSelected(s=> (sfx.select(), {...s,[k]:!s[k]})) }
-              blocked={!hasLeadership} onBlocked={blocked}/>
             <Buttons title="GUARDSMEN (G2–G9)" compact
               options={GUARDSMEN.map(k=>({key:k,text:k,on:!!selected[k]}))}
+              onClick={(k)=> setSelected(s=> (sfx.select(), {...s,[k]:!s[k]})) }
+              blocked={!hasLeadership} onBlocked={blocked}/>
+            <Buttons title="SPECIALISTS (S3–S9)" leadingBlank={1} compact
+              options={SPECIALISTS.map(k=>({key:k,text:k,on:!!selected[k]}))}
               onClick={(k)=> setSelected(s=> (sfx.select(), {...s,[k]:!s[k]})) }
               blocked={!hasLeadership} onBlocked={blocked}/>
           </div>
@@ -586,6 +586,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

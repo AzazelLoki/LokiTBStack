@@ -147,7 +147,7 @@ function HoverImageHelp({ src, alt = "Help" }) {
           <img
             src={src}
             alt={alt}
-            className="max-w-[70vw] md:max-w-md h-auto block rounded-xl shadow"
+            className="block rounded-xl shadow w-auto h-auto max-w-[92vw] sm:max-w-md"
           
           />
         </div>
@@ -347,9 +347,18 @@ export default function TBStackCalculator(){
 }
 .tb-help:hover{ filter:brightness(1.05); }
 .tb-pop{
-  position:absolute; top:110%; left:0; z-index:60;
+  position:absolute; top:110%; left:50%; transform:translateX(-50%); z-index:60;
   background:#f1debd; border:1px solid #9f7c5e; padding:.5rem;
   border-radius:.75rem; box-shadow:0 6px 18px rgba(0,0,0,.15);
+  max-width:min(92vw, 540px);  /* prevent horizontal overflow */
+}
+
+/* Mobile: pin as a centered fixed panel with scrolling if tall */
+@media (max-width: 640px){
+  .tb-pop{
+    position:fixed; top:12vh; left:50%; transform:translateX(-50%);
+    max-width:92vw; max-height:76vh; overflow:auto;
+  }
 }
 `}</style>
 
@@ -577,6 +586,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div>
   );
 }
+
 
 
 

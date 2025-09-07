@@ -69,7 +69,7 @@ import { Analytics } from "@vercel/analytics/react";
 // ==============================================================
 
 
-    // -------------------- SG (tier|type|health|ldr) --------------------
+// -------------------- SG (tier|type|health|ldr) --------------------
     
     const SG_CSV = [
       "G2|ranged|270|1",   "G2|melee|270|1",   "G2|mounted|540|2",
@@ -148,7 +148,7 @@ import { Analytics } from "@vercel/analytics/react";
     // Helper d’accès
     const getSGStrength = (tier, type) => SG_STRENGTH[tier]?.[type] || 0;
 
-    // MONSTRES (group|type|strength|health|name)
+// MONSTRES (group|type|strength|health|name)
     const MON_CSV = [
       "M3|ranged|1800|5700|Water Elemental",
       "M3|mounted|3900|11700|Battle Boar",
@@ -266,15 +266,150 @@ import { Analytics } from "@vercel/analytics/react";
     };
 
 // MERCENAIRES (type|strength|health|ldr)
-const MERC_CSV = "mercs-monsters-melee|410000|1230000|11;mercs-monsters-flying|690000|2070000|6;mercs-monsters-mounted|470000|1410000|9;mercs-monsters-ranged|440000|1320000|10;mercs-specialists-melee|11000|33000|409;mercs-specialists-flying|220000|660000|20;mercs-specialists-mounted|22000|66000|204;mercs-specialists-ranged|11000|33000|409;merc-guards-melee|11000|33000|409;merc-guards-flying|220000|660000|20;merc-guards-mounted|22000|66000|204;merc-guards-ranged|11000|33000|409;merc-cannon|55000|330000|23;merc-hunter|25000|75000|22;";
-const MERCS = MERC_CSV.split(';').filter(Boolean).map(r=>{ const [t,s,h,l]=r.split('|'); return {type:t,strength:+s,health:+h,ldr:+l}; });
+    const MERC_CSV = [
+      // — Mercenaires “monsters”
+      "mercs-monsters-melee|410000|1230000|11",
+      "mercs-monsters-flying|690000|2070000|6",
+      "mercs-monsters-mounted|470000|1410000|9",
+      "mercs-monsters-ranged|440000|1320000|10",
+    
+      // — Mercenaires “specialists”
+      "mercs-specialists-melee|11000|33000|409",
+      "mercs-specialists-flying|220000|660000|20",
+      "mercs-specialists-mounted|22000|66000|204",
+      "mercs-specialists-ranged|11000|33000|409",
+    
+      // — Mercenaires “guards”
+      "merc-guards-melee|11000|33000|409",
+      "merc-guards-flying|220000|660000|20",
+      "merc-guards-mounted|22000|66000|204",
+      "merc-guards-ranged|11000|33000|409",
+    
+      // — Spéciaux
+      "merc-cannon|55000|330000|23",
+      "merc-hunter|25000|75000|22",
+    ].join(";");
+    
+    const MERCS = MERC_CSV.split(";")
+      .filter(Boolean)
+      .map((r) => {
+        const [t, s, h, l] = r.split("|");
+        return { type: t, strength: +s, health: +h, ldr: +l };
+      });
+
 // -------------------- Audio (SFX) --------------------
-function useTBSfx(){ const ref=useRef(null); const ctx=()=> (ref.current ||= new ((window).AudioContext||(window).webkitAudioContext)()); const blip=(up)=>{ try{ const c=ctx(); const now=c.currentTime; const out=c.createGain(); out.gain.setValueAtTime(.0001,now); out.gain.exponentialRampToValueAtTime(.25,now+.01); out.gain.exponentialRampToValueAtTime(.0001,now+.25); out.connect(c.destination); const o=c.createOscillator(); o.type=up?"sine":"triangle"; o.frequency.setValueAtTime(up?660:220,now); o.frequency.exponentialRampToValueAtTime(up?880:120,now+.12); o.connect(out); o.start(now); o.stop(now+.22);}catch{}}; return {select:()=>blip(true), deselect:()=>blip(false)}; }
+    function useTBSfx(){ const ref=useRef(null); const ctx=()=> (ref.current ||= new ((window).AudioContext||(window).webkitAudioContext)()); const blip=(up)=>{ try{ const c=ctx(); const now=c.currentTime; const out=c.createGain(); out.gain.setValueAtTime(.0001,now); out.gain.exponentialRampToValueAtTime(.25,now+.01); out.gain.exponentialRampToValueAtTime(.0001,now+.25); out.connect(c.destination); const o=c.createOscillator(); o.type=up?"sine":"triangle"; o.frequency.setValueAtTime(up?660:220,now); o.frequency.exponentialRampToValueAtTime(up?880:120,now+.12); o.connect(out); o.start(now); o.stop(now+.22);}catch{}}; return {select:()=>blip(true), deselect:()=>blip(false)}; }// -------------------- Audio (SFX) --------------------
+    function useTBSfx() {
+      const ref = useRef(null);
+    
+      // AudioContext paresseux (avec fallback Safari via webkitAudioContext)
+      const ctx = () =>
+        (ref.current ||= new (
+          (window).AudioContext || (window).webkitAudioContext
+        )());
+    
+      // Petit bip. up=true => son "positif", sinon "négatif"
+      const blip = (up) => {
+        try {
+          const c = ctx();
+          const now = c.currentTime;
+    
+          // Enveloppe (gain)
+          const out = c.createGain();
+          out.gain.setValueAtTime(0.0001, now);
+          out.gain.exponentialRampToValueAtTime(0.25, now + 0.01);
+          out.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+          out.connect(c.destination);
+    
+          // Oscillateur
+          const o = c.createOscillator();
+          o.type = up ? "sine" : "triangle";
+          o.frequency.setValueAtTime(up ? 660 : 220, now);
+          o.frequency.exponentialRampToValueAtTime(up ? 880 : 120, now + 0.12);
+    
+          // Chaînage + lecture
+          o.connect(out);
+          o.start(now);
+          o.stop(now + 0.22);
+        } catch {
+          // Silencieusement ignorer (bloqué par l'autoplay, navigateur sans audio, etc.)
+        }
+      };
+    
+      return {
+        select: () => blip(true),
+        deselect: () => blip(false),
+      };
+    }
+
 // -------------------- Calcs --------------------
-const CONSTS={m:.988,a:.96,r:.98,s:.96,b:1.06};
-const computeAnchors=(L,SR)=>{ if(!L||!SR) return {BASE:0,ANCHOR:0,Imerc:0,Im6:0,Im5:0,Im4:0,Icannon:0}; const BASE=(L*CONSTS.m)/SR; const ANCHOR=BASE*CONSTS.a; const Imerc=ANCHOR*CONSTS.r; return {BASE,ANCHOR,Imerc,Im6:Imerc*CONSTS.s,Im5:Imerc*CONSTS.s**2,Im4:Imerc*CONSTS.s**3,Icannon:BASE*CONSTS.b}; };
-const computeSG=(leadership,selected,typePicks)=>{ const chosen=ORDER.filter(k=>selected[k]).flatMap(level=>{ const rows=DATA[level]; const picks=typePicks?.[level]; const flt=picks?.size? rows.filter(u=>picks.has(u.type)):rows; return flt.map(u=>({level,...u})); }); if(!chosen.length||leadership<=0) return {rows:[],used:0,leftover:leadership,T:0,SR:0}; const SR=chosen.reduce((a,u)=>a+u.ldr/u.health,0); const T=Math.floor(leadership/SR); const rows=chosen.map((u,i)=>{ const troops=Math.floor(Math.max(T-i,0)/u.health); const ldrUsed=troops*u.ldr; const unitStrength=getSGStrength(u.level,u.type); return {level:u.level,type:u.type,troops,totalHealth:troops*u.health,ldrUsed,unitStrength,totalStrength:troops*unitStrength}; }); const used=rows.reduce((a,r)=>a+r.ldrUsed,0); return {rows,used,leftover:leadership-used,T,SR}; };
-const nextLowerGroupOf=(full)=>{ if(!full.length) return null; const i=ORDER_MONSTERS.indexOf(full[full.length-1]); return i<0||i===ORDER_MONSTERS.length-1? null: ORDER_MONSTERS[i+1]; };
+    const CONSTS = { m: .988, a: .96, r: .98, s: .96, b: 1.06 };
+    
+    const computeAnchors = (L, SR) => {
+      if (!L || !SR) {
+        return { BASE: 0, ANCHOR: 0, Imerc: 0, Im6: 0, Im5: 0, Im4: 0, Icannon: 0 };
+      }
+    
+      const BASE   = (L * CONSTS.m) / SR;
+      const ANCHOR = BASE * CONSTS.a;
+      const Imerc  = ANCHOR * CONSTS.r;
+    
+      return {
+        BASE,
+        ANCHOR,
+        Imerc,
+        Im6: Imerc * CONSTS.s,
+        Im5: Imerc * CONSTS.s ** 2,
+        Im4: Imerc * CONSTS.s ** 3,
+        Icannon: BASE * CONSTS.b,
+      };
+    };
+    
+    const computeSG = (leadership, selected, typePicks) => {
+      const chosen = ORDER
+        .filter(k => selected[k])
+        .flatMap(level => {
+          const rows  = DATA[level];
+          const picks = typePicks?.[level];
+          const flt   = picks?.size ? rows.filter(u => picks.has(u.type)) : rows;
+          return flt.map(u => ({ level, ...u }));
+        });
+    
+      if (!chosen.length || leadership <= 0) {
+        return { rows: [], used: 0, leftover: leadership, T: 0, SR: 0 };
+      }
+    
+      const SR = chosen.reduce((a, u) => a + u.ldr / u.health, 0);
+      const T  = Math.floor(leadership / SR);
+    
+      const rows = chosen.map((u, i) => {
+        const troops       = Math.floor(Math.max(T - i, 0) / u.health);
+        const ldrUsed      = troops * u.ldr;
+        const unitStrength = getSGStrength(u.level, u.type);
+    
+        return {
+          level: u.level,
+          type: u.type,
+          troops,
+          totalHealth: troops * u.health,
+          ldrUsed,
+          unitStrength,
+          totalStrength: troops * unitStrength,
+        };
+      });
+    
+      const used = rows.reduce((a, r) => a + r.ldrUsed, 0);
+    
+      return { rows, used, leftover: leadership - used, T, SR };
+    };
+    
+    const nextLowerGroupOf = (full) => {
+      if (!full.length) return null;
+      const i = ORDER_MONSTERS.indexOf(full[full.length - 1]);
+      return (i < 0 || i === ORDER_MONSTERS.length - 1) ? null : ORDER_MONSTERS[i + 1];
+    };
+
+
 // -------------------- Composants compacts --------------------
 function Buttons({title,label,options,onClick,blocked,onBlocked,leadingBlank=0,compact}){
   const click=(ev,key)=>{ if(blocked){ onBlocked?.(ev); return; } onClick(key); };
@@ -894,6 +1029,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div> 
   );
 }
+
 
 
 

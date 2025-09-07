@@ -3,88 +3,160 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Analytics } from "@vercel/analytics/react";
 // ==============================================================
-// ==============================================================
-
 // -------------------- Utilitaires compacts --------------------
-
-// Effet texte lumineux (réutilisé dans plusieurs composants)
-const glow = {
-  textShadow:
-    "0 0 10px rgba(186,159,132,.45), 0 0 24px rgba(186,159,132,.25)",
-};
-
-// Classe “panneau” (bordure, coins arrondis, fond, blur, ombres)
-const clsPanel =
-  "border border-[#5b2a17] rounded-2xl p-5 bg-[rgba(241,222,189,0.85)] backdrop-blur-sm shadow-[inset_0_1px_0_rgba(186,159,132,0.25),0_10px_20px_rgba(159,124,94,0.25)]";
-
-/**
- * Retourne la chaîne de classes Tailwind d’un bouton.
- * - `on === true`  → style actif (fond sombre, texte clair, ombre intérieure)
- * - `on === false` → style neutre (fond clair, hover)
- *
- * ⚠️ Gardé en une seule ligne pour ne pas introduire de sauts de ligne
- * dans la template string (pas de changement de rendu).
- */
-const btnCls = (on) =>
-  `px-4 py-3 rounded-lg border w-full ${
-    on
-      ? "border-[#5b2a17] bg-[#80301d] text-[#f1debd] shadow-[0_4px_12px_rgba(128,48,29,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]"
-      : "border-[#ba9f84] text-[#5b2a17] bg-[#e8ceaa] hover:bg-[#d8bd9b]"
-  } text-lg md:text-xl`;
-
-// Cellules de tableau (header & data)
-const th =
-  "py-2 px-3 border-b border-[#9f7c5e] bg-[#80301d] text-center text-lg text-[#f1debd]";
-const td =
-  "py-2 px-3 border-b border-[#9f7c5e] text-center align-middle text-base";
-
-// Variantes alignées à gauche (on part des classes ci-dessus)
-const thL = th.replace("text-center", "text-left");
-const tdL = td.replace("text-center", "text-left");
-
-/**
- * Formatte un entier pour l’affichage (séparateurs de milliers).
- * Renvoie "0" si n’est pas un nombre fini.
- */
-const fmtInt = (n) =>
-  Number.isFinite(n) ? Math.floor(n).toLocaleString() : "0";
-
-/**
- * parseNumber
- *  - Accepte des strings avec espaces, points ou virgules : "12 500", "12,500", "12.500"
- *  - Nettoie tout ce qui n’est pas chiffre/point/virgule
- *  - Utilise la virgule comme décimale si présente
- *  - Renvoie 0 si non convertible
- */
-const parseNumber = (x) => {
-  // Si ce n’est pas une string, tenter Number(x) (0 par défaut)
-  if (typeof x !== "string") return Number(x) || 0;
-
-  // Nettoyage: garder seulement chiffres, points, virgules
-  const cleaned = x.replace(/[^0-9.,]/g, "");
-
-  // Interpréter la virgule comme séparateur décimal
-  const normalized = cleaned.replace(",", ".");
-
-  // Conversion → nombre
-  const n = Number(normalized);
-
-  // Si convertible, renvoyer le nombre ; sinon 0
-  return Number.isFinite(n) ? n : 0;
-};
-
-// ==============================================================
 // ==============================================================
 
-// -------------------- Données compactes → objets --------------------
-// SG (tier|type|health|ldr)
-const SG_CSV = "G2|ranged|270|1;G2|melee|270|1;G2|mounted|540|2;G3|ranged|480|1;G3|melee|480|1;G3|mounted|960|2;G4|ranged|870|1;G4|melee|870|1;G4|mounted|1740|2;G5|ranged|1560|1;G5|melee|1560|1;G5|mounted|3150|2;G5|flying|30000|20;G6|ranged|2820|1;G6|melee|2820|1;G6|mounted|5700|2;G6|flying|57000|20;G7|ranged|5100|1;G7|melee|5100|1;G7|mounted|10200|2;G7|flying|102000|20;G8|ranged|9180|1;G8|melee|9180|1;G8|mounted|18360|2;G8|flying|183600|20;G9|ranged|16530|1;G9|melee|16530|1;G9|mounted|33060|2;G9|flying|330600|20;S3|melee|480|1;S3|scout|240|5;S4|melee|870|1;S4|scout|450|5;S5|ranged|1560|1;S5|melee|1560|1;S5|mounted|3150|2;S5|flying|1560|1;S6|ranged|2820|1;S6|melee|2820|1;S6|mounted|5700|2;S6|flying|2820|1;S7|ranged|5100|1;S7|melee|5100|1;S7|mounted|10200|2;S7|flying|5100|1;S8|ranged|9180|1;S8|melee|9180|1;S8|mounted|18360|2;S8|flying|183600|20;S9|ranged|16530|1;S9|melee|16530|1;S9|mounted|33060|2;S9|flying|330600|20;";
-const DATA = {}; SG_CSV.split(';').filter(Boolean).forEach(r=>{ const [tier,type,h,l]=r.split('|'); (DATA[tier] ||= []).push({type,health:+h,ldr:+l}); });
-const SPECIALISTS = ["S3","S4","S5","S6","S7","S8","S9"]; const GUARDSMEN=["G2","G3","G4","G5","G6","G7","G8","G9"]; const ORDER=[...GUARDSMEN,...SPECIALISTS].sort((a,b)=>{const mh=(k)=>Math.min(...DATA[k].map(u=>u.health)); const [ha,hb]=[mh(a),mh(b)]; return ha===hb? a.localeCompare(b):ha-hb;});
-// Strengths SG (tier|type|strength)
-const SG_STR_CSV = "G5|ranged|520;G5|melee|520;G5|mounted|1050;G5|flying|10000;G6|ranged|940;G6|melee|940;G6|mounted|1900;G6|flying|19000;G7|ranged|1700;G7|melee|1700;G7|mounted|3400;G7|flying|34000;G8|ranged|3060;G8|melee|3060;G8|mounted|6120;G8|flying|61200;G9|ranged|5150;G9|melee|5150;G9|mounted|11020;G9|flying|110200;S5|ranged|520;S5|melee|520;S5|mounted|1050;S5|flying|520;S6|ranged|940;S6|melee|940;S6|mounted|1900;S6|flying|940;S7|ranged|1700;S7|melee|1700;S7|mounted|3400;S7|flying|1700;S8|ranged|3060;S8|melee|3060;S8|mounted|6120;S8|flying|61200;S9|ranged|5510;S9|melee|5510;S9|mounted|11020;S9|flying|110200;";
-const SG_STRENGTH={}; SG_STR_CSV.split(';').filter(Boolean).forEach(r=>{ const [tier,type,s]=r.split('|'); (SG_STRENGTH[tier] ||= {}); SG_STRENGTH[tier][type]=+s; });
-const getSGStrength=(tier,type)=> (SG_STRENGTH[tier]?.[type]||0);
+    // Effet texte lumineux (réutilisé dans plusieurs composants)
+    const glow = {
+      textShadow:
+        "0 0 10px rgba(186,159,132,.45), 0 0 24px rgba(186,159,132,.25)",
+    };
+
+    // Classe “panneau” (bordure, coins arrondis, fond, blur, ombres)
+    const clsPanel =
+      "border border-[#5b2a17] rounded-2xl p-5 bg-[rgba(241,222,189,0.85)] backdrop-blur-sm shadow-[inset_0_1px_0_rgba(186,159,132,0.25),0_10px_20px_rgba(159,124,94,0.25)]";
+    
+    const btnCls = (on) =>
+      `px-4 py-3 rounded-lg border w-full ${
+        on
+          ? "border-[#5b2a17] bg-[#80301d] text-[#f1debd] shadow-[0_4px_12px_rgba(128,48,29,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]"
+          : "border-[#ba9f84] text-[#5b2a17] bg-[#e8ceaa] hover:bg-[#d8bd9b]"
+      } text-lg md:text-xl`;
+    
+    // Cellules de tableau (header & data)
+    const th =
+      "py-2 px-3 border-b border-[#9f7c5e] bg-[#80301d] text-center text-lg text-[#f1debd]";
+    const td =
+      "py-2 px-3 border-b border-[#9f7c5e] text-center align-middle text-base";
+    
+    // Variantes alignées à gauche (on part des classes ci-dessus)
+    const thL = th.replace("text-center", "text-left");
+    const tdL = td.replace("text-center", "text-left");
+    
+    /**
+     * Formatte un entier pour l’affichage (séparateurs de milliers).
+     * Renvoie "0" si n’est pas un nombre fini.
+     */
+    const fmtInt = (n) =>
+      Number.isFinite(n) ? Math.floor(n).toLocaleString() : "0";
+    
+    /**
+     * parseNumber
+     *  - Accepte des strings avec espaces, points ou virgules : "12 500", "12,500", "12.500"
+     *  - Nettoie tout ce qui n’est pas chiffre/point/virgule
+     *  - Utilise la virgule comme décimale si présente
+     *  - Renvoie 0 si non convertible
+     */
+    const parseNumber = (x) => {
+      // Si ce n’est pas une string, tenter Number(x) (0 par défaut)
+      if (typeof x !== "string") return Number(x) || 0;
+    
+      // Nettoyage: garder seulement chiffres, points, virgules
+      const cleaned = x.replace(/[^0-9.,]/g, "");
+    
+      // Interpréter la virgule comme séparateur décimal
+      const normalized = cleaned.replace(",", ".");
+    
+      // Conversion → nombre
+      const n = Number(normalized);
+    
+      // Si convertible, renvoyer le nombre ; sinon 0
+      return Number.isFinite(n) ? n : 0;
+    };
+
+// ==============================================================
+// ---------------- Données compactes → objets ------------------
+// ==============================================================
+
+
+// -------------------- SG (tier|type|health|ldr) --------------------
+
+const SG_CSV = [
+  "G2|ranged|270|1",   "G2|melee|270|1",   "G2|mounted|540|2",
+  "G3|ranged|480|1",   "G3|melee|480|1",   "G3|mounted|960|2",
+  "G4|ranged|870|1",   "G4|melee|870|1",   "G4|mounted|1740|2",
+  "G5|ranged|1560|1",  "G5|melee|1560|1",  "G5|mounted|3150|2",
+  "G5|flying|30000|20",
+  "G6|ranged|2820|1",  "G6|melee|2820|1",  "G6|mounted|5700|2",
+  "G6|flying|57000|20",
+  "G7|ranged|5100|1",  "G7|melee|5100|1",  "G7|mounted|10200|2",
+  "G7|flying|102000|20",
+  "G8|ranged|9180|1",  "G8|melee|9180|1",  "G8|mounted|18360|2",
+  "G8|flying|183600|20",
+  "G9|ranged|16530|1", "G9|melee|16530|1", "G9|mounted|33060|2",
+  "G9|flying|330600|20",
+
+  "S3|melee|480|1",    "S3|scout|240|5",
+  "S4|melee|870|1",    "S4|scout|450|5",
+  "S5|ranged|1560|1",  "S5|melee|1560|1",  "S5|mounted|3150|2",
+  "S5|flying|1560|1",
+  "S6|ranged|2820|1",  "S6|melee|2820|1",  "S6|mounted|5700|2",
+  "S6|flying|2820|1",
+  "S7|ranged|5100|1",  "S7|melee|5100|1",  "S7|mounted|10200|2",
+  "S7|flying|5100|1",
+  "S8|ranged|9180|1",  "S8|melee|9180|1",  "S8|mounted|18360|2",
+  "S8|flying|183600|20",
+  "S9|ranged|16530|1", "S9|melee|16530|1", "S9|mounted|33060|2",
+  "S9|flying|330600|20",
+].join(";");
+
+// Parse → DATA[tier] = [{ type, health, ldr }, ...]
+const DATA = {};
+SG_CSV.split(";")
+  .filter(Boolean)
+  .forEach((r) => {
+    const [tier, type, h, l] = r.split("|");
+    (DATA[tier] ||= []).push({ type, health: +h, ldr: +l });
+  });
+
+// Listes de tiers
+const SPECIALISTS = ["S3", "S4", "S5", "S6", "S7", "S8", "S9"];
+const GUARDSMEN  = ["G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9"];
+
+/**
+ * ORDER : S/G triés par leur “HP minimal par tier”
+ * - on calcule mh(tier) = min(HP des unités du tier)
+ * - tri croissant par ce min ; égalité → tri alphabétique
+ */
+const ORDER = [...GUARDSMEN, ...SPECIALISTS].sort((a, b) => {
+  const mh = (k) => Math.min(...DATA[k].map((u) => u.health));
+  const ha = mh(a);
+  const hb = mh(b);
+  return ha === hb ? a.localeCompare(b) : ha - hb;
+});
+
+
+// -------------------- Strengths SG (tier|type|strength) --------------------
+
+const SG_STR_CSV = [
+  // Guardsmen
+  "G5|ranged|520",  "G5|melee|520",  "G5|mounted|1050", "G5|flying|10000",
+  "G6|ranged|940",  "G6|melee|940",  "G6|mounted|1900", "G6|flying|19000",
+  "G7|ranged|1700", "G7|melee|1700", "G7|mounted|3400", "G7|flying|34000",
+  "G8|ranged|3060", "G8|melee|3060", "G8|mounted|6120", "G8|flying|61200",
+  "G9|ranged|5150", "G9|melee|5150", "G9|mounted|11020","G9|flying|110200",
+
+  // Specialists
+  "S5|ranged|520",  "S5|melee|520",  "S5|mounted|1050", "S5|flying|520",
+  "S6|ranged|940",  "S6|melee|940",  "S6|mounted|1900", "S6|flying|940",
+  "S7|ranged|1700", "S7|melee|1700", "S7|mounted|3400", "S7|flying|1700",
+  "S8|ranged|3060", "S8|melee|3060", "S8|mounted|6120", "S8|flying|61200",
+  "S9|ranged|5510", "S9|melee|5510", "S9|mounted|11020","S9|flying|110200",
+].join(";");
+
+// Parse → SG_STRENGTH[tier][type] = strength
+const SG_STRENGTH = {};
+SG_STR_CSV.split(";")
+  .filter(Boolean)
+  .forEach((r) => {
+    const [tier, type, s] = r.split("|");
+    (SG_STRENGTH[tier] ||= {});
+    SG_STRENGTH[tier][type] = +s;
+  });
+
+// Helper d’accès
+const getSGStrength = (tier, type) => SG_STRENGTH[tier]?.[type] || 0;
+
 // MONSTRES (group|type|strength|health|name)
 const MON_CSV = "M3|ranged|1800|5700|Water Elemental;M3|mounted|3900|11700|Battle Boar;M3|flying|4500|13500|Emerald Dragon;M3|flying|5200|15600|Stone Gargoyle;M4|melee|13000|39000|Many-Armed;M4|flying|17000|51000|Iced Phoenix;M4|ranged|15000|45000|Gordon Medusa;M4|ranged|15000|45000|Magic Dragon;M5|melee|48000|144000|Ettin;M5|mounted|42000|126000|Desert Vanquisher;M5|mounted|44000|132000|Falming Centaur;M5|flying|46000|138000|Fearsome Manticore;M6|melee|120000|360000|Crystal Dragon;M6|melee|130000|390000|Ruby Golem;M6|melee|130000|390000|Jungle Destroyer;M6|mounted|110000|310000|Troll Rider;M7|melee|310000|930000|Wind Lord;M7|ranged|290000|870000|Destructive Colossus;M7|mounted|280000|840000|Ancient Terror;M7|flying|300000|900000|Black Dragon;M8|melee|670000|2010000|Kraken I;M8|ranged|640000|1920000|Trickster I;M8|mounted|650000|1950000|Devastator I;M8|flying|660000|1980000|Fire Phoenix I;M9|melee|1210000|3630000|Kraken II;M9|ranged|1150000|3450000|Trickster II;M9|mounted|1170000|3510000|Devastator II;M9|flying|1190000|3570000|Fire Phoenix II;";
 const MONSTERS={}; MON_CSV.split(';').filter(Boolean).forEach(r=>{ const [g,t,s,h,n]=r.split('|'); (MONSTERS[g] ||= []); MONSTERS[g].push({type:t,strength:+s,health:+h,name:n});});
@@ -751,6 +823,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div> 
   );
 }
+
 
 
 

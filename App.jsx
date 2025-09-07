@@ -298,49 +298,48 @@ import { Analytics } from "@vercel/analytics/react";
       });
 
 // -------------------- Audio (SFX) --------------------
-    function useTBSfx(){ const ref=useRef(null); const ctx=()=> (ref.current ||= new ((window).AudioContext||(window).webkitAudioContext)()); const blip=(up)=>{ try{ const c=ctx(); const now=c.currentTime; const out=c.createGain(); out.gain.setValueAtTime(.0001,now); out.gain.exponentialRampToValueAtTime(.25,now+.01); out.gain.exponentialRampToValueAtTime(.0001,now+.25); out.connect(c.destination); const o=c.createOscillator(); o.type=up?"sine":"triangle"; o.frequency.setValueAtTime(up?660:220,now); o.frequency.exponentialRampToValueAtTime(up?880:120,now+.12); o.connect(out); o.start(now); o.stop(now+.22);}catch{}}; return {select:()=>blip(true), deselect:()=>blip(false)}; }// -------------------- Audio (SFX) --------------------
-    function useTBSfx() {
-      const ref = useRef(null);
-    
-      // AudioContext paresseux (avec fallback Safari via webkitAudioContext)
-      const ctx = () =>
-        (ref.current ||= new (
-          (window).AudioContext || (window).webkitAudioContext
-        )());
-    
-      // Petit bip. up=true => son "positif", sinon "négatif"
-      const blip = (up) => {
-        try {
-          const c = ctx();
-          const now = c.currentTime;
-    
-          // Enveloppe (gain)
-          const out = c.createGain();
-          out.gain.setValueAtTime(0.0001, now);
-          out.gain.exponentialRampToValueAtTime(0.25, now + 0.01);
-          out.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
-          out.connect(c.destination);
-    
-          // Oscillateur
-          const o = c.createOscillator();
-          o.type = up ? "sine" : "triangle";
-          o.frequency.setValueAtTime(up ? 660 : 220, now);
-          o.frequency.exponentialRampToValueAtTime(up ? 880 : 120, now + 0.12);
-    
-          // Chaînage + lecture
-          o.connect(out);
-          o.start(now);
-          o.stop(now + 0.22);
-        } catch {
-          // Silencieusement ignorer (bloqué par l'autoplay, navigateur sans audio, etc.)
-        }
-      };
-    
-      return {
-        select: () => blip(true),
-        deselect: () => blip(false),
-      };
+function useTBSfx() {
+  const ref = useRef(null);
+
+  // AudioContext paresseux (avec fallback Safari via webkitAudioContext)
+  const ctx = () =>
+    (ref.current ||= new (
+      (window).AudioContext || (window).webkitAudioContext
+    )());
+
+  // Petit bip. up=true => son "positif", sinon "négatif"
+  const blip = (up) => {
+    try {
+      const c = ctx();
+      const now = c.currentTime;
+
+      // Enveloppe (gain)
+      const out = c.createGain();
+      out.gain.setValueAtTime(0.0001, now);
+      out.gain.exponentialRampToValueAtTime(0.25, now + 0.01);
+      out.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      out.connect(c.destination);
+
+      // Oscillateur
+      const o = c.createOscillator();
+      o.type = up ? "sine" : "triangle";
+      o.frequency.setValueAtTime(up ? 660 : 220, now);
+      o.frequency.exponentialRampToValueAtTime(up ? 880 : 120, now + 0.12);
+
+      // Chaînage + lecture
+      o.connect(out);
+      o.start(now);
+      o.stop(now + 0.22);
+    } catch {
+      // Silencieusement ignorer (bloqué par l'autoplay, navigateur sans audio, etc.)
     }
+  };
+
+  return {
+    select: () => blip(true),
+    deselect: () => blip(false),
+  };
+}
 
 // -------------------- Calcs --------------------
     const CONSTS = { m: .988, a: .96, r: .98, s: .96, b: 1.06 };
@@ -1029,6 +1028,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div> 
   );
 }
+
 
 
 

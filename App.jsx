@@ -69,131 +69,202 @@ import { Analytics } from "@vercel/analytics/react";
 // ==============================================================
 
 
-// -------------------- SG (tier|type|health|ldr) --------------------
+    // -------------------- SG (tier|type|health|ldr) --------------------
+    
+    const SG_CSV = [
+      "G2|ranged|270|1",   "G2|melee|270|1",   "G2|mounted|540|2",
+      "G3|ranged|480|1",   "G3|melee|480|1",   "G3|mounted|960|2",
+      "G4|ranged|870|1",   "G4|melee|870|1",   "G4|mounted|1740|2",
+      "G5|ranged|1560|1",  "G5|melee|1560|1",  "G5|mounted|3150|2",  "G5|flying|30000|20",
+      "G6|ranged|2820|1",  "G6|melee|2820|1",  "G6|mounted|5700|2",  "G6|flying|57000|20",
+      "G7|ranged|5100|1",  "G7|melee|5100|1",  "G7|mounted|10200|2", "G7|flying|102000|20",
+      "G8|ranged|9180|1",  "G8|melee|9180|1",  "G8|mounted|18360|2", "G8|flying|183600|20",
+      "G9|ranged|16530|1", "G9|melee|16530|1", "G9|mounted|33060|2", "G9|flying|330600|20",
+    
+    
+      "S3|melee|480|1",    "S3|scout|240|5",
+      "S4|melee|870|1",    "S4|scout|450|5",
+      "S5|ranged|1560|1",  "S5|melee|1560|1",  "S5|mounted|3150|2",  "S5|flying|1560|1",
+      "S6|ranged|2820|1",  "S6|melee|2820|1",  "S6|mounted|5700|2",  "S6|flying|2820|1",
+      "S7|ranged|5100|1",  "S7|melee|5100|1",  "S7|mounted|10200|2", "S7|flying|5100|1",
+      "S8|ranged|9180|1",  "S8|melee|9180|1",  "S8|mounted|18360|2", "S8|flying|183600|20",
+      "S9|ranged|16530|1", "S9|melee|16530|1", "S9|mounted|33060|2", "S9|flying|330600|20",
+      
+    ].join(";");
 
-const SG_CSV = [
-  "G2|ranged|270|1",   "G2|melee|270|1",   "G2|mounted|540|2",
-  "G3|ranged|480|1",   "G3|melee|480|1",   "G3|mounted|960|2",
-  "G4|ranged|870|1",   "G4|melee|870|1",   "G4|mounted|1740|2",
-  "G5|ranged|1560|1",  "G5|melee|1560|1",  "G5|mounted|3150|2",
-  "G5|flying|30000|20",
-  "G6|ranged|2820|1",  "G6|melee|2820|1",  "G6|mounted|5700|2",
-  "G6|flying|57000|20",
-  "G7|ranged|5100|1",  "G7|melee|5100|1",  "G7|mounted|10200|2",
-  "G7|flying|102000|20",
-  "G8|ranged|9180|1",  "G8|melee|9180|1",  "G8|mounted|18360|2",
-  "G8|flying|183600|20",
-  "G9|ranged|16530|1", "G9|melee|16530|1", "G9|mounted|33060|2",
-  "G9|flying|330600|20",
-
-  "S3|melee|480|1",    "S3|scout|240|5",
-  "S4|melee|870|1",    "S4|scout|450|5",
-  "S5|ranged|1560|1",  "S5|melee|1560|1",  "S5|mounted|3150|2",
-  "S5|flying|1560|1",
-  "S6|ranged|2820|1",  "S6|melee|2820|1",  "S6|mounted|5700|2",
-  "S6|flying|2820|1",
-  "S7|ranged|5100|1",  "S7|melee|5100|1",  "S7|mounted|10200|2",
-  "S7|flying|5100|1",
-  "S8|ranged|9180|1",  "S8|melee|9180|1",  "S8|mounted|18360|2",
-  "S8|flying|183600|20",
-  "S9|ranged|16530|1", "S9|melee|16530|1", "S9|mounted|33060|2",
-  "S9|flying|330600|20",
-].join(";");
-
-// Parse → DATA[tier] = [{ type, health, ldr }, ...]
-const DATA = {};
-SG_CSV.split(";")
-  .filter(Boolean)
-  .forEach((r) => {
-    const [tier, type, h, l] = r.split("|");
-    (DATA[tier] ||= []).push({ type, health: +h, ldr: +l });
-  });
-
-// Listes de tiers
-const SPECIALISTS = ["S3", "S4", "S5", "S6", "S7", "S8", "S9"];
-const GUARDSMEN  = ["G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9"];
-
-/**
- * ORDER : S/G triés par leur “HP minimal par tier”
- * - on calcule mh(tier) = min(HP des unités du tier)
- * - tri croissant par ce min ; égalité → tri alphabétique
- */
-const ORDER = [...GUARDSMEN, ...SPECIALISTS].sort((a, b) => {
-  const mh = (k) => Math.min(...DATA[k].map((u) => u.health));
-  const ha = mh(a);
-  const hb = mh(b);
-  return ha === hb ? a.localeCompare(b) : ha - hb;
-});
+    // Parse → DATA[tier] = [{ type, health, ldr }, ...]
+    const DATA = {};
+    SG_CSV.split(";")
+      .filter(Boolean)
+      .forEach((r) => {
+        const [tier, type, h, l] = r.split("|");
+        (DATA[tier] ||= []).push({ type, health: +h, ldr: +l });
+      });
+    
+    // Listes de tiers
+    const GUARDSMEN  = ["G2", "G3", "G4", "G5", "G6", "G7", "G8", "G9"];
+    const SPECIALISTS = ["S3", "S4", "S5", "S6", "S7", "S8", "S9"];
+    /**
+     * ORDER : S/G triés par leur “HP minimal par tier”
+     * - on calcule mh(tier) = min(HP des unités du tier)
+     * - tri croissant par ce min ; égalité → tri alphabétique
+     */
+    const ORDER = [...GUARDSMEN, ...SPECIALISTS].sort((a, b) => {
+      const mh = (k) => Math.min(...DATA[k].map((u) => u.health));
+      const ha = mh(a);
+      const hb = mh(b);
+      return ha === hb ? a.localeCompare(b) : ha - hb;
+    });
 
 
-// -------------------- Strengths SG (tier|type|strength) --------------------
+    // -------------------- Strengths SG (tier|type|strength) --------------------
+    
+    const SG_STR_CSV = [
+      // Guardsmen
+      "G5|ranged|520",  "G5|melee|520",  "G5|mounted|1050", "G5|flying|10000",
+      "G6|ranged|940",  "G6|melee|940",  "G6|mounted|1900", "G6|flying|19000",
+      "G7|ranged|1700", "G7|melee|1700", "G7|mounted|3400", "G7|flying|34000",
+      "G8|ranged|3060", "G8|melee|3060", "G8|mounted|6120", "G8|flying|61200",
+      "G9|ranged|5150", "G9|melee|5150", "G9|mounted|11020","G9|flying|110200",
+    
+      // Specialists
+      "S5|ranged|520",  "S5|melee|520",  "S5|mounted|1050", "S5|flying|520",
+      "S6|ranged|940",  "S6|melee|940",  "S6|mounted|1900", "S6|flying|940",
+      "S7|ranged|1700", "S7|melee|1700", "S7|mounted|3400", "S7|flying|1700",
+      "S8|ranged|3060", "S8|melee|3060", "S8|mounted|6120", "S8|flying|61200",
+      "S9|ranged|5510", "S9|melee|5510", "S9|mounted|11020","S9|flying|110200",
+    ].join(";");
+    
+    // Parse → SG_STRENGTH[tier][type] = strength
+    const SG_STRENGTH = {};
+    SG_STR_CSV.split(";")
+      .filter(Boolean)
+      .forEach((r) => {
+        const [tier, type, s] = r.split("|");
+        (SG_STRENGTH[tier] ||= {});
+        SG_STRENGTH[tier][type] = +s;
+      });
+    
+    // Helper d’accès
+    const getSGStrength = (tier, type) => SG_STRENGTH[tier]?.[type] || 0;
 
-const SG_STR_CSV = [
-  // Guardsmen
-  "G5|ranged|520",  "G5|melee|520",  "G5|mounted|1050", "G5|flying|10000",
-  "G6|ranged|940",  "G6|melee|940",  "G6|mounted|1900", "G6|flying|19000",
-  "G7|ranged|1700", "G7|melee|1700", "G7|mounted|3400", "G7|flying|34000",
-  "G8|ranged|3060", "G8|melee|3060", "G8|mounted|6120", "G8|flying|61200",
-  "G9|ranged|5150", "G9|melee|5150", "G9|mounted|11020","G9|flying|110200",
+    // MONSTRES (group|type|strength|health|name)
+    const MON_CSV = [
+      "M3|ranged|1800|5700|Water Elemental",
+      "M3|mounted|3900|11700|Battle Boar",
+      "M3|flying|4500|13500|Emerald Dragon",
+      "M3|flying|5200|15600|Stone Gargoyle",
+    
+      "M4|melee|13000|39000|Many-Armed",
+      "M4|flying|17000|51000|Iced Phoenix",
+      "M4|ranged|15000|45000|Gordon Medusa",
+      "M4|ranged|15000|45000|Magic Dragon",
+    
+      "M5|melee|48000|144000|Ettin",
+      "M5|mounted|42000|126000|Desert Vanquisher",
+      "M5|mounted|44000|132000|Falming Centaur",
+      "M5|flying|46000|138000|Fearsome Manticore",
+    
+      "M6|melee|120000|360000|Crystal Dragon",
+      "M6|melee|130000|390000|Ruby Golem",
+      "M6|melee|130000|390000|Jungle Destroyer",
+      "M6|mounted|110000|310000|Troll Rider",
+    
+      "M7|melee|310000|930000|Wind Lord",
+      "M7|ranged|290000|870000|Destructive Colossus",
+      "M7|mounted|280000|840000|Ancient Terror",
+      "M7|flying|300000|900000|Black Dragon",
+    
+      "M8|melee|670000|2010000|Kraken I",
+      "M8|ranged|640000|1920000|Trickster I",
+      "M8|mounted|650000|1950000|Devastator I",
+      "M8|flying|660000|1980000|Fire Phoenix I",
+    
+      "M9|melee|1210000|3630000|Kraken II",
+      "M9|ranged|1150000|3450000|Trickster II",
+      "M9|mounted|1170000|3510000|Devastator II",
+      "M9|flying|1190000|3570000|Fire Phoenix II",
+    ].join(";");
+    
+    const MONSTERS = {};
+    MON_CSV.split(";")
+      .filter(Boolean)
+      .forEach((r) => {
+        const [g, t, s, h, n] = r.split("|");
+        (MONSTERS[g] ||= []);
+        MONSTERS[g].push({
+          type: t,
+          strength: +s,
+          health: +h,
+          name: n,
+        });
+      });
+    
+    const MON_GROUPS = Object.keys(MONSTERS);
+    const ORDER_MONSTERS_UI = ["M3", "M4", "M5", "M6", "M7", "M8", "M9"];
+    
+    // Fonctions d'aide pour le tri
+    const mS = (g) => Math.max(...MONSTERS[g].map((u) => u.strength));
+    const mH = (g) => Math.max(...MONSTERS[g].map((u) => u.health));
+    
+    const ORDER_MONSTERS = [...MON_GROUPS].sort((a, b) =>
+      mS(a) === mS(b) ? mH(b) - mH(a) : mS(b) - mS(a)
+    );
+    
+    // 🔹 Monster icon URLs (GitHub raw links)
+    const MONSTER_ICONS = {
+      "Water Elemental":
+        "https://raw.githubusercontent.com/AzazelLoki/Loki_tb-icons/refs/heads/main/M3-WaterElemental.png",
+      "Battle Boar":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M3-Battle%20Boar.png?raw=true",
+      "Emerald Dragon":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M3-Emerald%20Dragon.png?raw=true",
+      "Stone Gargoyle":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M3-Stone%20Gargoyle.png?raw=true",
+      "Gordon Medusa":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Gorgon%20Medusa.png?raw=true",
+      "Iced Phoenix":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Ice%20Phoenix.png?raw=true",
+      "Magic Dragon":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Magic%20Dragon.png?raw=true",
+      "Many-Armed":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Many-Armed%20Guardian.png?raw=true",
+      "Desert Vanquisher":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Desert%20Vanquisher.png?raw=true",
+      "Ettin":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Ettin.png?raw=true",
+      "Fearsome Manticore":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Fearsome%20Manticore.png?raw=true",
+      "Falming Centaur":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Flaming%20Centaur.png?raw=true",
+      "Crystal Dragon":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Crystal%20Dragon.png?raw=true",
+      "Jungle Destroyer":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Jungle%20Destroyer.png?raw=true",
+      "Ruby Golem":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Ruby%20Golem.png?raw=true",
+      "Troll Rider":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Troll%20Rider.png?raw=true",
+      "Ancient Terror":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Ancient%20Terror.png?raw=true",
+      "Black Dragon":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Black%20Dragon.png?raw=true",
+      "Destructive Colossus":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Destructive%20Colosus.png?raw=true",
+      "Wind Lord":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Wind%20Lord.png?raw=true",
+      "Devastator I":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Devastator%20I.png?raw=true",
+      "Fire Phoenix I":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Fire%20Phoenix%20I.png?raw=true",
+      "Kraken I":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Kraken%20I.png?raw=true",
+      "Trickster I":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true",
+      "Leadership":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/Leadership.png?raw=true",
+    };
 
-  // Specialists
-  "S5|ranged|520",  "S5|melee|520",  "S5|mounted|1050", "S5|flying|520",
-  "S6|ranged|940",  "S6|melee|940",  "S6|mounted|1900", "S6|flying|940",
-  "S7|ranged|1700", "S7|melee|1700", "S7|mounted|3400", "S7|flying|1700",
-  "S8|ranged|3060", "S8|melee|3060", "S8|mounted|6120", "S8|flying|61200",
-  "S9|ranged|5510", "S9|melee|5510", "S9|mounted|11020","S9|flying|110200",
-].join(";");
-
-// Parse → SG_STRENGTH[tier][type] = strength
-const SG_STRENGTH = {};
-SG_STR_CSV.split(";")
-  .filter(Boolean)
-  .forEach((r) => {
-    const [tier, type, s] = r.split("|");
-    (SG_STRENGTH[tier] ||= {});
-    SG_STRENGTH[tier][type] = +s;
-  });
-
-// Helper d’accès
-const getSGStrength = (tier, type) => SG_STRENGTH[tier]?.[type] || 0;
-
-// MONSTRES (group|type|strength|health|name)
-const MON_CSV = "M3|ranged|1800|5700|Water Elemental;M3|mounted|3900|11700|Battle Boar;M3|flying|4500|13500|Emerald Dragon;M3|flying|5200|15600|Stone Gargoyle;M4|melee|13000|39000|Many-Armed;M4|flying|17000|51000|Iced Phoenix;M4|ranged|15000|45000|Gordon Medusa;M4|ranged|15000|45000|Magic Dragon;M5|melee|48000|144000|Ettin;M5|mounted|42000|126000|Desert Vanquisher;M5|mounted|44000|132000|Falming Centaur;M5|flying|46000|138000|Fearsome Manticore;M6|melee|120000|360000|Crystal Dragon;M6|melee|130000|390000|Ruby Golem;M6|melee|130000|390000|Jungle Destroyer;M6|mounted|110000|310000|Troll Rider;M7|melee|310000|930000|Wind Lord;M7|ranged|290000|870000|Destructive Colossus;M7|mounted|280000|840000|Ancient Terror;M7|flying|300000|900000|Black Dragon;M8|melee|670000|2010000|Kraken I;M8|ranged|640000|1920000|Trickster I;M8|mounted|650000|1950000|Devastator I;M8|flying|660000|1980000|Fire Phoenix I;M9|melee|1210000|3630000|Kraken II;M9|ranged|1150000|3450000|Trickster II;M9|mounted|1170000|3510000|Devastator II;M9|flying|1190000|3570000|Fire Phoenix II;";
-const MONSTERS={}; MON_CSV.split(';').filter(Boolean).forEach(r=>{ const [g,t,s,h,n]=r.split('|'); (MONSTERS[g] ||= []); MONSTERS[g].push({type:t,strength:+s,health:+h,name:n});});
-const MON_GROUPS = Object.keys(MONSTERS);
-const ORDER_MONSTERS_UI = ["M3","M4","M5","M6","M7","M8","M9"];
-// Définition propre de la fonction de tri avec constantes séparées
-const mS = g => Math.max(...MONSTERS[g].map(u=>u.strength));
-const mH = g => Math.max(...MONSTERS[g].map(u=>u.health));
-const ORDER_MONSTERS = [...MON_GROUPS].sort((a,b) => mS(a)===mS(b)? mH(b)-mH(a) : mS(b)-mS(a) );
-// 🔹 Monster icon URLs (GitHub raw links)
-const MONSTER_ICONS = {
-  "Water Elemental": "https://raw.githubusercontent.com/AzazelLoki/Loki_tb-icons/refs/heads/main/M3-WaterElemental.png",
-  "Battle Boar": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M3-Battle%20Boar.png?raw=true",
-  "Emerald Dragon": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M3-Emerald%20Dragon.png?raw=true",
-  "Stone Gargoyle": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M3-Stone%20Gargoyle.png?raw=true",
-  "Gordon Medusa": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Gorgon%20Medusa.png?raw=true",
-  "Iced Phoenix": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Ice%20Phoenix.png?raw=true",
-  "Magic Dragon": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Magic%20Dragon.png?raw=true",
-  "Many-Armed": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M4-Many-Armed%20Guardian.png?raw=true",
-  "Desert Vanquisher": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Desert%20Vanquisher.png?raw=true",
-  "Ettin": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Ettin.png?raw=true",
-  "Fearsome Manticore": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Fearsome%20Manticore.png?raw=true",
-  "Falming Centaur": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M5-Flaming%20Centaur.png?raw=true",
-  "Crystal Dragon": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Crystal%20Dragon.png?raw=true",
-  "Jungle Destroyer": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Jungle%20Destroyer.png?raw=true",
-  "Ruby Golem": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Ruby%20Golem.png?raw=true",
-  "Troll Rider": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M6-Troll%20Rider.png?raw=true",
-  "Ancient Terror": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Ancient%20Terror.png?raw=true",
-  "Black Dragon": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Black%20Dragon.png?raw=true",
-  "Destructive Colossus": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Destructive%20Colosus.png?raw=true",
-  "Wind Lord": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M7-Wind%20Lord.png?raw=true",
-  "Devastator I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Devastator%20I.png?raw=true",
-  "Fire Phoenix I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Fire%20Phoenix%20I.png?raw=true",
-  "Kraken I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Kraken%20I.png?raw=true",
-  "Trickster I": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true",
-  "Leadership": "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/Leadership.png?raw=true"
-};
 // MERCENAIRES (type|strength|health|ldr)
 const MERC_CSV = "mercs-monsters-melee|410000|1230000|11;mercs-monsters-flying|690000|2070000|6;mercs-monsters-mounted|470000|1410000|9;mercs-monsters-ranged|440000|1320000|10;mercs-specialists-melee|11000|33000|409;mercs-specialists-flying|220000|660000|20;mercs-specialists-mounted|22000|66000|204;mercs-specialists-ranged|11000|33000|409;merc-guards-melee|11000|33000|409;merc-guards-flying|220000|660000|20;merc-guards-mounted|22000|66000|204;merc-guards-ranged|11000|33000|409;merc-cannon|55000|330000|23;merc-hunter|25000|75000|22;";
 const MERCS = MERC_CSV.split(';').filter(Boolean).map(r=>{ const [t,s,h,l]=r.split('|'); return {type:t,strength:+s,health:+h,ldr:+l}; });
@@ -823,6 +894,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div> 
   );
 }
+
 
 
 

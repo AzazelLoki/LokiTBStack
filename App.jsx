@@ -2,21 +2,80 @@
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Analytics } from "@vercel/analytics/react";
-// v07c (compact, fixed):
-// • Conserve visuel + comportements
-// • Réduction de lignes via composants factorisés & data CSV → objetsbuy
-// • Correction: balises JSX bien fermées (erreur "Expected corresponding JSX closing tag for <div>")
-// • Ajout de petits tests (console.assert) pour prévenir les régressions
+// ==============================================================
+// ==============================================================
+
 // -------------------- Utilitaires compacts --------------------
-const glow = { textShadow: "0 0 10px rgba(186,159,132,.45), 0 0 24px rgba(186,159,132,.25)" };
-const clsPanel = "border border-[#5b2a17] rounded-2xl p-5 bg-[rgba(241,222,189,0.85)] backdrop-blur-sm shadow-[inset_0_1px_0_rgba(186,159,132,0.25),0_10px_20px_rgba(159,124,94,0.25)]";
-const btnCls = (on)=>`px-4 py-3 rounded-lg border w-full ${on?"border-[#5b2a17] bg-[#80301d] text-[#f1debd] shadow-[0_4px_12px_rgba(128,48,29,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]":"border-[#ba9f84] text-[#5b2a17] bg-[#e8ceaa] hover:bg-[#d8bd9b]"} text-lg md:text-xl`;
-const th = "py-2 px-3 border-b border-[#9f7c5e] bg-[#80301d] text-center text-lg text-[#f1debd]";
-const td = "py-2 px-3 border-b border-[#9f7c5e] text-center align-middle text-base";
-const thL = th.replace("text-center","text-left");
-const tdL = td.replace("text-center","text-left");
-const fmtInt = (n)=> (Number.isFinite(n)? Math.floor(n).toLocaleString():"0");
-const parseNumber=(x)=>{ if(typeof x!=="string") return Number(x)||0; const n=Number(x.replace(/[^0-9.,]/g,"").replace(",",".")); return Number.isFinite(n)?n:0; };
+
+// Effet texte lumineux (réutilisé dans plusieurs composants)
+const glow = {
+  textShadow:
+    "0 0 10px rgba(186,159,132,.45), 0 0 24px rgba(186,159,132,.25)",
+};
+
+// Classe “panneau” (bordure, coins arrondis, fond, blur, ombres)
+const clsPanel =
+  "border border-[#5b2a17] rounded-2xl p-5 bg-[rgba(241,222,189,0.85)] backdrop-blur-sm shadow-[inset_0_1px_0_rgba(186,159,132,0.25),0_10px_20px_rgba(159,124,94,0.25)]";
+
+/**
+ * Retourne la chaîne de classes Tailwind d’un bouton.
+ * - `on === true`  → style actif (fond sombre, texte clair, ombre intérieure)
+ * - `on === false` → style neutre (fond clair, hover)
+ *
+ * ⚠️ Gardé en une seule ligne pour ne pas introduire de sauts de ligne
+ * dans la template string (pas de changement de rendu).
+ */
+const btnCls = (on) =>
+  `px-4 py-3 rounded-lg border w-full ${
+    on
+      ? "border-[#5b2a17] bg-[#80301d] text-[#f1debd] shadow-[0_4px_12px_rgba(128,48,29,0.35),inset_0_1px_0_rgba(255,255,255,0.25)]"
+      : "border-[#ba9f84] text-[#5b2a17] bg-[#e8ceaa] hover:bg-[#d8bd9b]"
+  } text-lg md:text-xl`;
+
+// Cellules de tableau (header & data)
+const th =
+  "py-2 px-3 border-b border-[#9f7c5e] bg-[#80301d] text-center text-lg text-[#f1debd]";
+const td =
+  "py-2 px-3 border-b border-[#9f7c5e] text-center align-middle text-base";
+
+// Variantes alignées à gauche (on part des classes ci-dessus)
+const thL = th.replace("text-center", "text-left");
+const tdL = td.replace("text-center", "text-left");
+
+/**
+ * Formatte un entier pour l’affichage (séparateurs de milliers).
+ * Renvoie "0" si n’est pas un nombre fini.
+ */
+const fmtInt = (n) =>
+  Number.isFinite(n) ? Math.floor(n).toLocaleString() : "0";
+
+/**
+ * parseNumber
+ *  - Accepte des strings avec espaces, points ou virgules : "12 500", "12,500", "12.500"
+ *  - Nettoie tout ce qui n’est pas chiffre/point/virgule
+ *  - Utilise la virgule comme décimale si présente
+ *  - Renvoie 0 si non convertible
+ */
+const parseNumber = (x) => {
+  // Si ce n’est pas une string, tenter Number(x) (0 par défaut)
+  if (typeof x !== "string") return Number(x) || 0;
+
+  // Nettoyage: garder seulement chiffres, points, virgules
+  const cleaned = x.replace(/[^0-9.,]/g, "");
+
+  // Interpréter la virgule comme séparateur décimal
+  const normalized = cleaned.replace(",", ".");
+
+  // Conversion → nombre
+  const n = Number(normalized);
+
+  // Si convertible, renvoyer le nombre ; sinon 0
+  return Number.isFinite(n) ? n : 0;
+};
+
+// ==============================================================
+// ==============================================================
+
 // -------------------- Données compactes → objets --------------------
 // SG (tier|type|health|ldr)
 const SG_CSV = "G2|ranged|270|1;G2|melee|270|1;G2|mounted|540|2;G3|ranged|480|1;G3|melee|480|1;G3|mounted|960|2;G4|ranged|870|1;G4|melee|870|1;G4|mounted|1740|2;G5|ranged|1560|1;G5|melee|1560|1;G5|mounted|3150|2;G5|flying|30000|20;G6|ranged|2820|1;G6|melee|2820|1;G6|mounted|5700|2;G6|flying|57000|20;G7|ranged|5100|1;G7|melee|5100|1;G7|mounted|10200|2;G7|flying|102000|20;G8|ranged|9180|1;G8|melee|9180|1;G8|mounted|18360|2;G8|flying|183600|20;G9|ranged|16530|1;G9|melee|16530|1;G9|mounted|33060|2;G9|flying|330600|20;S3|melee|480|1;S3|scout|240|5;S4|melee|870|1;S4|scout|450|5;S5|ranged|1560|1;S5|melee|1560|1;S5|mounted|3150|2;S5|flying|1560|1;S6|ranged|2820|1;S6|melee|2820|1;S6|mounted|5700|2;S6|flying|2820|1;S7|ranged|5100|1;S7|melee|5100|1;S7|mounted|10200|2;S7|flying|5100|1;S8|ranged|9180|1;S8|melee|9180|1;S8|mounted|18360|2;S8|flying|183600|20;S9|ranged|16530|1;S9|melee|16530|1;S9|mounted|33060|2;S9|flying|330600|20;";
@@ -692,6 +751,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div> 
   );
 }
+
 
 
 

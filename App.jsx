@@ -921,57 +921,35 @@ const monstersRowsSorted = useMemo(
   )}
 </div>
 
-{/* ================= Leadership ================= */}
-{(() => {
-  // Classes et états locaux lisibles (aucun changement fonctionnel)
-  const inputBaseCls =
-    "bg-[#f1debd] text-[#5b2a17] border rounded px-5 py-4 w-full md:w-[26rem] text-2xl md:text-3xl focus:outline-none";
-  const isEmpty        = !ldrInput.trim();
-  const inputStateCls  = isEmpty ? "border-[#80301d] animate-glow" : "border-[#9f7c5e]";
-  const showHelperText = L > 0 && !Object.values(selected).some(Boolean);
+<input
+  id="ldr-input"
+  className={bg-[#f1debd] text-[#5b2a17] border rounded px-5 py-4 w-full md:w-[26rem] text-2xl md:text-3xl focus:outline-none ${!ldrInput.trim()? 'border-[#80301d] animate-glow':'border-[#9f7c5e]'}}
+  placeholder="E.G. 125000"
+  value={ldrInput}
+  onChange={e=>setLdrInput(e.target.value)}
+  inputMode="numeric"
+  onFocus={()=>sfx.select()}
+/>
 
-  return (
-    <>
-      <input
-        id="ldr-input"
-        className={`${inputBaseCls} ${inputStateCls}`}
-        placeholder="E.G. 125000"
-        value={ldrInput}
-        onChange={(e) => setLdrInput(e.target.value)}
-        inputMode="numeric"
-        onFocus={() => sfx.select()}
-      />
+{L>0 && !Object.values(selected).some(Boolean) ? (
+  <div className="text-base md:text-lg font-semibold animate-blink" style={glow}>
+    ↓ choose tiers below ↓
+  </div>
+) : null}
 
-      {showHelperText && (
-        <div
-          className="text-base md:text-lg font-semibold animate-blink"
-          style={glow}
-        >
-          ↓ choose tiers below ↓
-        </div>
-      )}
-    </>
-  );
-})()}
+</div>
+</div>
 
-{/* ================= S/G ================= */}
-<section className={`${clsPanel} mx-2`}>
-  <h2 className="text-lg mb-3" style={glow}>
-    GUARDSMEN / SPECIALISTS
-  </h2>
+{/* S/G */}
+<section className={${clsPanel} mx-2}>
+  <h2 className="text-lg mb-3" style={glow}>GUARDSMEN / SPECIALISTS</h2>
 
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
     <Buttons
       title="GUARDSMEN (G2–G9)"
       compact
-      options={GUARDSMEN.map((k) => ({
-        key: k,
-        text: k,
-        on: !!selected[k],
-      }))}
-      onClick={(k) =>
-        setSelected((s) => (sfx.select(), { ...s, [k]: !s[k] }))
-      }
+      options={GUARDSMEN.map(k=>({key:k,text:k,on:!!selected[k]}))}
+      onClick={(k)=> setSelected(s=> (sfx.select(), {...s,[k]:!s[k]}))}
       blocked={!hasLeadership}
       onBlocked={blocked}
     />
@@ -980,14 +958,8 @@ const monstersRowsSorted = useMemo(
       title="SPECIALISTS (S3–S9)"
       leadingBlank={1}
       compact
-      options={SPECIALISTS.map((k) => ({
-        key: k,
-        text: k,
-        on: !!selected[k],
-      }))}
-      onClick={(k) =>
-        setSelected((s) => (sfx.select(), { ...s, [k]: !s[k] }))
-      }
+      options={SPECIALISTS.map(k=>({key:k,text:k,on:!!selected[k]}))}
+      onClick={(k)=> setSelected(s=> (sfx.select(), {...s,[k]:!s[k]}))}
       blocked={!hasLeadership}
       onBlocked={blocked}
     />
@@ -995,37 +967,33 @@ const monstersRowsSorted = useMemo(
 
   <div className="mt-4">
     <div className="flex items-center gap-3 mb-2 tb-switch">
-      <span className="text-sm opacity-80" style={glow}>
+      <span style={glow} className="text-sm opacity-80">
         UNIT TYPE PICKS BY TIER (optional)
       </span>
-
       <button
         type="button"
         role="switch"
         aria-checked={showTypePicks}
-        className={`tb-toggle ${showTypePicks ? "on" : ""}`}
-        onClick={() => setShowTypePicks((v) => !v)}
+        className={tb-toggle ${showTypePicks?'on':''}}
+        onClick={()=>setShowTypePicks(v=>!v)}
       >
-        <span className="tb-toggle-knob" />
+        <span className="tb-toggle-knob"/>
       </button>
     </div>
 
-    <div className={`tb-slide ${showTypePicks ? "open" : ""}`}>
-      {ORDER.filter((t) => selected[t]).map((tier) => (
+    <div className={tb-slide ${showTypePicks? 'open':''}}>
+      {ORDER.filter(t=>selected[t]).map(tier=> (
         <Buttons
           key={tier}
-          label={`${tier} — choose unit types (none = all)`}
+          label={${tier} — choose unit types (none = all)}
           compact
-          options={DATA[tier].map((u) => ({
-            key:  `${tier}:${u.type}`,
-            text: `${tier} · ${u.type} · HP ${u.health.toLocaleString()}`,
-            icon: iconFor(tier, u.type),
-            on:   !!(typePicks[tier]?.has(u.type)),
+          options={DATA[tier].map(u=>({
+            key:${tier}:${u.type},
+            text:${tier} · ${u.type} · HP ${u.health.toLocaleString()},
+            icon: iconFor(tier,u.type),
+            on:!!(typePicks[tier]?.has(u.type))
           }))}
-          onClick={(key) => {
-            const [, type] = key.split(":");
-            toggleType(tier, type);
-          }}
+          onClick={(key)=>{ const [,type]=key.split(':'); toggleType(tier,type); }}
           blocked={!hasLeadership}
           onBlocked={blocked}
         />
@@ -1034,66 +1002,52 @@ const monstersRowsSorted = useMemo(
   </div>
 </section>
 
-{/* ================= Monsters selection ================= */}
-<section className={`${clsPanel} mx-2`}>
-  <h2 className="text-lg mb-3" style={glow}>
-    MONSTERS
-  </h2>
+{/* Monsters selection */}
+<section className={${clsPanel} mx-2}>
+  <h2 className="text-lg mb-3" style={glow}>MONSTERS</h2>
 
   <Buttons
     label="FULL GROUPS (LOW → HIGH)"
     leadingBlank={1}
     compact
-    options={ORDER_MONSTERS_UI.map((k) => ({
-      key: k,
-      text: k,
-      on: !!monsterFull[k],
-    }))}
-    onClick={(k) =>
-      setMonsterFull((s) => ({ ...s, [k]: !s[k] }))
-    }
+    options={ORDER_MONSTERS_UI.map(k=>({key:k,text:k,on:!!monsterFull[k]}))}
+    onClick={(k)=> setMonsterFull(s=>({...s,[k]:!s[k]}))}
     blocked={!hasLeadership}
     onBlocked={blocked}
   />
 
   <div className="mt-4">
     <div className="flex items-center gap-3 mb-2 tb-switch">
-      <span className="text-sm opacity-80" style={glow}>
+      <span style={glow} className="text-sm opacity-80">
         ENTRY PICKS BY GROUP (optional)
       </span>
-
       <button
         type="button"
         role="switch"
         aria-checked={showEntryPicks}
-        className={`tb-toggle ${showEntryPicks ? "on" : ""}`}
-        onClick={() => setShowEntryPicks((v) => !v)}
+        className={tb-toggle ${showEntryPicks?'on':''}}
+        onClick={()=>setShowEntryPicks(v=>!v)}
       >
-        <span className="tb-toggle-knob" />
+        <span className="tb-toggle-knob"/>
       </button>
     </div>
 
-    <div className={`tb-slide ${showEntryPicks ? "open" : ""}`}>
-      {fullSelectedOrdered.length === 0 ? (
-        <div className="opacity-70">
-          Select at least one group above.
-        </div>
+    <div className={tb-slide ${showEntryPicks? 'open':''}}>
+      {fullSelectedOrdered.length===0 ? (
+        <div className="opacity-70">Select at least one group above.</div>
       ) : (
-        fullSelectedOrdered.map((group) => (
+        fullSelectedOrdered.map(group=> (
           <Buttons
             key={group}
-            label={`${group} — choose entries (none = all)`}
+            label={${group} — choose entries (none = all)}
             compact
-            options={MONSTERS[group].map((u, idx) => ({
-              key:  `${group}:${idx}`,
-              text: `${u.name}\n${u.type}`,
+            options={MONSTERS[group].map((u,idx)=>({
+              key:${group}:${idx},
+              text:${u.name} ${u.type},
               icon: MONSTER_ICONS[u.name],
-              on:   !!(entryPicks[group]?.has(idx)),
+              on:!!(entryPicks[group]?.has(idx))
             }))}
-            onClick={(key) => {
-              const [g, i] = key.split(":");
-              toggleEntry(g, Number(i));
-            }}
+            onClick={(key)=>{ const [g,i]=key.split(':'); toggleEntry(g,Number(i)); }}
             blocked={!hasLeadership}
             onBlocked={blocked}
           />
@@ -1103,40 +1057,33 @@ const monstersRowsSorted = useMemo(
   </div>
 </section>
 
-{/* ================= Monsters & Mercs result ================= */}
-<section className={`${clsPanel} mx-2`}>
-  <h2 className="text-lg mb-3" style={glow}>
-    MONSTERS & MERCS RESULT
-  </h2>
+{/* Monsters and Mercs side by side */}
+<section className={${clsPanel} mx-2}>
+  <h2 className="text-lg mb-3" style={glow}>MONSTERS & MERCS RESULT</h2>
 
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Mercs à gauche */}
+    {/* Mercs à gauche, ordre d'affichage prioritaire */}
     {hasMercResults && (
       <div>
-        <h3 className="font-semibold mb-3" style={glow}>
-          Mercs
-        </h3>
-
+        <h3 className="font-semibold mb-3" style={glow}>Mercs</h3>
         <SimpleTable
           large
           left
           headers={["Type", "Count"]}
-          rows={mercRowsNZ.map((m) => [m.type, m.count])}
+          rows={mercRowsNZ.map(m=>[m.type,m.count])}
         />
       </div>
     )}
 
     {/* Monsters à droite */}
     <div>
-      <h3 className="font-semibold mb-3" style={glow}>
-        Monsters
-      </h3>
+      <h3 className="font-semibold mb-3" style={glow}>Monsters</h3>
 
       {monstersRows.length ? (
         <SimpleTable
           left
-          headers={["Group", "Name", "Image", "Count"]}
-          rows={monstersRowsSorted.map((m) => {
+          headers={["Group","Name","Image","Count"]}
+          rows={monstersRowsSorted.map(m => {
             const imgSrc = MONSTER_ICONS[m.name] || null;
             const imgTag = imgSrc ? (
               <img
@@ -1144,9 +1091,7 @@ const monstersRowsSorted = useMemo(
                 alt={m.name}
                 className="tb-icon-sm w-[96px] h-[96px] rounded-lg object-contain mx-auto"
               />
-            ) : (
-              "—"
-            );
+            ) : "—";
             return [m.group, m.name, imgTag, m.count];
           })}
         />
@@ -1240,6 +1185,7 @@ const monstersRowsSorted = useMemo(
     </div> 
   );
 }
+
 
 
 

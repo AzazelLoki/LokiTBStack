@@ -973,14 +973,18 @@ const monstersRowsSorted = useMemo(
         UNIT TYPE PICKS BY TIER (optional)
       </span>
       <button
-        type="button"
-        role="switch"
-        aria-checked={showTypePicks}
-        className={`tb-toggle ${showTypePicks ? 'on' : ''}`}
-        onClick={() => setShowTypePicks(v => !v)}
-      >
-        <span className="tb-toggle-knob" />
-      </button>
+  type="button"
+  role="switch"
+  aria-checked={showTypePicks}
+  className={`tb-toggle ${showTypePicks ? 'on' : ''}`}
+  onClick={() => setShowTypePicks(v => {
+    const next = !v;
+    next ? sfx.select() : sfx.deselect(); // 🔊
+    return next;
+  })}
+>
+  <span className="tb-toggle-knob" />
+</button>
     </div>
 
     <div className={`tb-slide ${showTypePicks ? 'open' : ''}`}>
@@ -1206,6 +1210,7 @@ const monstersRowsSorted = useMemo(
     </div> 
   );
 }
+
 
 
 

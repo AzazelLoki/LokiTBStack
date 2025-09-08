@@ -1008,38 +1008,36 @@ const monstersRowsSorted = useMemo(
 <section className={`${clsPanel} mx-2`}>
   <h2 className="text-lg mb-3" style={glow}>MONSTERS</h2>
 
-<Buttons
-  label="FULL GROUPS (LOW → HIGH)"
-  leadingBlank={1}
-  compact
-  options={ORDER_MONSTERS_UI.map(k => ({ key: k, text: k, on: !!monsterFull[k] }))}
-  onClick={(k) => setMonsterFull(s => {
-    const nextOn = !s[k];
-    nextOn ? sfx.select() : sfx.deselect(); // 🔊
-    return { ...s, [k]: nextOn };
-  })}
-  blocked={!hasLeadership}
-  onBlocked={blocked}
-/>
+  <Buttons
+    label="FULL GROUPS (LOW → HIGH)"
+    leadingBlank={1}
+    compact
+    options={ORDER_MONSTERS_UI.map(k => ({ key: k, text: k, on: !!monsterFull[k] }))}
+    onClick={(k) => {
+      const nextOn = !monsterFull[k];
+      nextOn ? sfx.select() : sfx.deselect(); // 🔊
+      setMonsterFull(prev => ({ ...prev, [k]: nextOn }));
+    }}
+    blocked={!hasLeadership}
+    onBlocked={blocked}
+  />
 
   <div className="mt-4">
     <div className="flex items-center gap-3 mb-2 tb-switch">
       <span style={glow} className="text-sm opacity-80">
         ENTRY PICKS BY GROUP (optional)
       </span>
-<button
-  type="button"
-  role="switch"
-  aria-checked={showEntryPicks}
-  className={`tb-toggle ${showEntryPicks ? 'on' : ''}`}
-  onClick={() => setShowEntryPicks(v => {
-    const next = !v;
-    next ? sfx.select() : sfx.deselect(); // 🔊
-    return next;
-  })}
->
-  <span className="tb-toggle-knob" />
-</button>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={showEntryPicks}
+        className={`tb-toggle ${showEntryPicks ? 'on' : ''}`}
+        onClick={() => setShowEntryPicks(v => {
+          const next = !v;
+          next ? sfx.select() : sfx.deselect(); // 🔊
+          return next;
+        })}
+      >
         <span className="tb-toggle-knob" />
       </button>
     </div>
@@ -1059,7 +1057,10 @@ const monstersRowsSorted = useMemo(
               icon: MONSTER_ICONS[u.name],
               on: !!(entryPicks[group]?.has(idx)),
             }))}
-            onClick={(key) => { const [g, i] = key.split(':'); toggleEntry(g, Number(i)); }}
+            onClick={(key) => {
+              const [g, i] = key.split(':');
+              toggleEntry(g, Number(i));
+            }}
             blocked={!hasLeadership}
             onBlocked={blocked}
           />
@@ -1068,6 +1069,7 @@ const monstersRowsSorted = useMemo(
     </div>
   </div>
 </section>
+
 
 {/* Monsters and Mercs side by side */}
 <section className={`${clsPanel} mx-2`}>
@@ -1204,6 +1206,7 @@ const monstersRowsSorted = useMemo(
     </div> 
   );
 }
+
 
 
 

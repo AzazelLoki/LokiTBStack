@@ -923,7 +923,29 @@ useEffect(() => {
                 <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#1f4318] border border-[#4d7139] text-[#f1debd] text-sm font-semibold leading-none">V0,7</span>
               </div>
 <div className="flex items-center gap-2">
-  <button className="tb-close" aria-label="Reset all" title="Reset all" onClick={reset}>×</button>
+ <button
+  type="button"
+  className="tb-close"
+  aria-label="Reset all"
+  title="Reset all"
+  onClick={reset}
+>
+  <svg
+    className="w-6 h-6 pointer-events-none"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M16 3l5 5-5 5" />
+    <path d="M21 8a9 9 0 0 0-15-3" />
+    <path d="M8 21l-5-5 5-5" />
+    <path d="M3 16a9 9 0 0 0 15 3" />
+  </svg>
+</button>
+
   <button
     className="btn-back"
     type="button"
@@ -1314,6 +1336,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

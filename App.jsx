@@ -704,6 +704,36 @@ const monstersRowsSorted = useMemo(
   const [showEntryPicks,setShowEntryPicks]=useState(false);
   const [showSGBuild,setShowSGBuild]=useState(false);
   const [showCalcs,setShowCalcs]=useState(false);
+// ---- Contact modal (email) ----
+const [contactOpen, setContactOpen] = useState(false);
+const [contact, setContact] = useState({ from: "", subject: "", message: "" });
+
+// ⚠️ mets ici ton adresse de réception
+const RECEIVER_EMAIL = "votre.adresse@email";
+
+const openContact = () => { sfx.select(); setContactOpen(true); };
+const closeContact = () => { sfx.deselect(); setContactOpen(false); };
+
+const handleSend = (e) => {
+  e.preventDefault();
+  const body = `${contact.message}\n\n---\nFrom: ${contact.from || "(no email)"}`;
+  const mailto =
+    `mailto:${RECEIVER_EMAIL}` +
+    `?subject=${encodeURIComponent(contact.subject)}` +
+    `&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+  sfx.select();
+  setContactOpen(false);
+};
+
+// (optionnel) Échap pour fermer
+useEffect(() => {
+  if (!contactOpen) return;
+  const onKey = (e) => e.key === "Escape" && closeContact();
+  window.addEventListener("keydown", onKey);
+  return () => window.removeEventListener("keydown", onKey);
+}, [contactOpen]);
+
   // -------------------- Tests rapides (ne modifient rien à l'UI) --------------------
   useEffect(()=>{
     const A=computeAnchors(100,.5); console.assert(Math.abs(A.BASE-197.6)<.3,'BASE math');
@@ -891,7 +921,18 @@ const monstersRowsSorted = useMemo(
                 <h1 className="text-2xl md:text-3xl tracking-wide text-[#f1debd]" style={glow}>TB - STACK CALCULATOR</h1>
                 <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#1f4318] border border-[#4d7139] text-[#f1debd] text-sm font-semibold leading-none">V0,7</span>
               </div>
-              <button className="tb-close" aria-label="Reset all" title="Reset all" onClick={reset}>×</button>
+              <div className="flex items-center gap-2">
+  <button className="tb-close" aria-label="Reset all" title="Reset all" onClick={reset}>×</button>
+  <button
+    className="btn-back"
+    type="button"
+    title="Contact"
+    onClick={openContact}
+  >
+    Contact
+  </button>
+</div>
+
             </div>
             <div className="h-[3px] bg-[linear-gradient(90deg,#caa85e,#f5e4a3,#d1a640,#f0d38f,#caa85e)] shadow-[0_2px_8px_rgba(208,173,96,0.5)]"></div>
           </div>
@@ -1202,6 +1243,66 @@ const monstersRowsSorted = useMemo(
             <div className="tb-toast-inner">{toast}</div>
           </div>
         )}
+
+        {/* Contact Modal */}
+{contactOpen && (
+  <div
+    className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-[2px] flex items-center justify-center px-3"
+    role="dialog"
+    aria-modal="true"
+    onClick={(e) => { if (e.target === e.currentTarget) closeContact(); }}
+  >
+    <div className={`${clsPanel} w-full max-w-lg relative`}>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xl md:text-2xl" style={glow}>Contact</h3>
+        <button className="tb-close" aria-label="Close" onClick={closeContact}>×</button>
+      </div>
+
+      <form onSubmit={handleSend} className="space-y-3">
+        <div>
+          <label className="block text-sm opacity-80 mb-1" style={glow}>Votre email (optionnel)</label>
+          <input
+            type="email"
+            value={contact.from}
+            onChange={(e) => setContact(p => ({ ...p, from: e.target.value }))}
+            className="w-full bg-[#f1debd] text-[#5b2a17] border border-[#9f7c5e] rounded px-3 py-2 focus:outline-none"
+            placeholder="vous@domaine.com"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm opacity-80 mb-1" style={glow}>Sujet</label>
+          <input
+            required
+            value={contact.subject}
+            onChange={(e) => setContact(p => ({ ...p, subject: e.target.value }))}
+            className="w-full bg-[#f1debd] text-[#5b2a17] border border-[#9f7c5e] rounded px-3 py-2 focus:outline-none"
+            placeholder="Sujet"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm opacity-80 mb-1" style={glow}>Message</label>
+          <textarea
+            required
+            rows={6}
+            value={contact.message}
+            onChange={(e) => setContact(p => ({ ...p, message: e.target.value }))}
+            className="w-full bg-[#f1debd] text-[#5b2a17] border border-[#9f7c5e] rounded px-3 py-2 focus:outline-none"
+            placeholder="Votre message…"
+          />
+        </div>
+
+        <div className="flex items-center justify-end gap-2 pt-1">
+          <button type="button" className="btn-back" onClick={closeContact}>Annuler</button>
+          <button type="submit" className="btn-back" onClick={() => sfx.select()}>Envoyer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+        
       {/* LØKI */}
       <div className="fixed bottom-4 right-4 z-[60] select-none">
         <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle">LØKI</span></div>
@@ -1210,6 +1311,7 @@ const monstersRowsSorted = useMemo(
     </div> 
   );
 }
+
 
 
 

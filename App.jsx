@@ -1008,15 +1008,19 @@ const monstersRowsSorted = useMemo(
 <section className={`${clsPanel} mx-2`}>
   <h2 className="text-lg mb-3" style={glow}>MONSTERS</h2>
 
-  <Buttons
-    label="FULL GROUPS (LOW → HIGH)"
-    leadingBlank={1}
-    compact
-    options={ORDER_MONSTERS_UI.map(k => ({ key: k, text: k, on: !!monsterFull[k] }))}
-    onClick={(k) => setMonsterFull(s => ({ ...s, [k]: !s[k] }))}
-    blocked={!hasLeadership}
-    onBlocked={blocked}
-  />
+<Buttons
+  label="FULL GROUPS (LOW → HIGH)"
+  leadingBlank={1}
+  compact
+  options={ORDER_MONSTERS_UI.map(k => ({ key: k, text: k, on: !!monsterFull[k] }))}
+  onClick={(k) => setMonsterFull(s => {
+    const nextOn = !s[k];
+    nextOn ? sfx.select() : sfx.deselect(); // 🔊
+    return { ...s, [k]: nextOn };
+  })}
+  blocked={!hasLeadership}
+  onBlocked={blocked}
+/>
 
   <div className="mt-4">
     <div className="flex items-center gap-3 mb-2 tb-switch">
@@ -1194,6 +1198,7 @@ const monstersRowsSorted = useMemo(
     </div> 
   );
 }
+
 
 
 

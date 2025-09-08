@@ -1027,13 +1027,19 @@ const monstersRowsSorted = useMemo(
       <span style={glow} className="text-sm opacity-80">
         ENTRY PICKS BY GROUP (optional)
       </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={showEntryPicks}
-        className={`tb-toggle ${showEntryPicks ? 'on' : ''}`}
-        onClick={() => setShowEntryPicks(v => !v)}
-      >
+<button
+  type="button"
+  role="switch"
+  aria-checked={showEntryPicks}
+  className={`tb-toggle ${showEntryPicks ? 'on' : ''}`}
+  onClick={() => setShowEntryPicks(v => {
+    const next = !v;
+    next ? sfx.select() : sfx.deselect(); // 🔊
+    return next;
+  })}
+>
+  <span className="tb-toggle-knob" />
+</button>
         <span className="tb-toggle-knob" />
       </button>
     </div>
@@ -1198,6 +1204,7 @@ const monstersRowsSorted = useMemo(
     </div> 
   );
 }
+
 
 
 

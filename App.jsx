@@ -409,43 +409,112 @@ function useTBSfx() {
     };
 
 
-// -------------------- Composants compacts --------------------
-function Buttons({title,label,options,onClick,blocked,onBlocked,leadingBlank=0,compact}){
-  const click=(ev,key)=>{ if(blocked){ onBlocked?.(ev); return; } onClick(key); };
+// ==================== Buttons ====================
+function Buttons({
+  title,
+  label,
+  options = [],
+  onClick,
+  blocked,
+  onBlocked,
+  leadingBlank = 0,
+  compact,
+}) {
+  // tailles (évite les répétitions)
+  const sizeText = compact ? "text-sm md:text-base" : "text-base md:text-xl";
+  const sizePad  = compact ? "py-2" : "";
+  const sizeCls  = `${sizePad} ${sizeText}`;
+
+  const handleClick = (ev, key) => {
+    if (blocked) { onBlocked?.(ev); return; }
+    onClick?.(key);
+  };
+
   return (
     <div className="mb-3">
       {title && <h3 className="mb-2" style={glow}>{title}</h3>}
       {label && <div className="text-sm opacity-80 mb-1" style={glow}>{label}</div>}
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {Array.from({length:leadingBlank}).map((_,i)=>(<button key={'blank-'+i} type="button" aria-hidden className={`${btnCls(false)} pointer-events-none ${compact?'py-2 text-sm md:text-base':''}`} tabIndex={-1}/>))}
-        {options.map(o=> (
-          <button key={o.key} type="button" aria-pressed={!!o.on} aria-disabled={blocked||undefined}
-            className={`${btnCls(!!o.on)} ${compact?'py-2 text-sm md:text-base':''} ${blocked?'opacity-60 cursor-not-allowed':''}`}
-            onClick={(ev)=>click(ev,o.key)}>
-            <div className={`flex flex-col items-center justify-center gap-2 ${compact?'text-sm md:text-base':'text-base md:text-xl'}`}>
-              {o.icon && (<img src={o.icon} alt="" className="tb-icon w-[96px] h-[96px] rounded-xl object-contain shrink-0 pointer-events-none select-none" />)}
-              <span className={(compact?"text-sm md:text-base":"text-base md:text-xl")+" whitespace-pre-line leading-tight text-center"} style={glow}>{o.text}</span>
-            </div>
-          </button>
+        {/* blancs en tête */}
+        {Array.from({ length: leadingBlank }).map((_, i) => (
+          <button
+            key={`blank-${i}`}
+            type="button"
+            aria-hidden
+            tabIndex={-1}
+            className={`${btnCls(false)} pointer-events-none ${sizeCls}`}
+          />
         ))}
+
+        {/* options */}
+        {options.map(({ key, on, icon, text }) => {
+          const btnStateCls = `${btnCls(!!on)} ${sizeCls} ${
+            blocked ? "opacity-60 cursor-not-allowed" : ""
+          }`;
+
+          return (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={!!on}
+              aria-disabled={blocked || undefined}
+              className={btnStateCls}
+              onClick={(ev) => handleClick(ev, key)}
+            >
+              <div className={`flex flex-col items-center justify-center gap-2 ${sizeText}`}>
+                {icon && (
+                  <img
+                    src={icon}
+                    alt=""
+                    className="tb-icon w-[96px] h-[96px] rounded-xl object-contain shrink-0 pointer-events-none select-none"
+                  />
+                )}
+                <span
+                  className={`${sizeText} whitespace-pre-line leading-tight text-center`}
+                  style={glow}
+                >
+                  {text}
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
-function SimpleTable({headers,rows,left,large}){
+
+
+// ==================== SimpleTable ====================
+function SimpleTable({ headers = [], rows = [], left, large }) {
+  const tableSize = large ? "text-lg md:text-2xl" : "text-base md:text-lg";
+  const formatCell = (v) => (Number.isFinite(v) ? Math.floor(v).toLocaleString() : v);
+
   return (
-    <table className={`w-full ${large ? 'text-lg md:text-2xl' : 'text-base md:text-lg'} border border-[#9f7c5e]`}>
-      <thead><tr>{headers.map((h,i)=>(<th key={i} className={left&&i===0?thL:th}>{h}</th>))}</tr></thead>
+    <table className={`w-full ${tableSize} border border-[#9f7c5e]`}>
+      <thead>
+        <tr>
+          {headers.map((h, i) => (
+            <th key={i} className={left && i === 0 ? thL : th}>{h}</th>
+          ))}
+        </tr>
+      </thead>
       <tbody>
-        {rows.map((r,i)=>(
+        {rows.map((r, i) => (
           <tr key={i} className="hover:bg-[#f1debd]">
-            {r.map((c,j)=>(<td key={j} className={left&&j===0?tdL:td}>{typeof c==="number"? Math.floor(c).toLocaleString():c}</td>))}
+            {r.map((c, j) => (
+              <td key={j} className={left && j === 0 ? tdL : td}>
+                {formatCell(c)}
+              </td>
+            ))}
           </tr>
         ))}
       </tbody>
     </table>
   );
 }
+
 // -------------------- ToolTip --------------------
 function useIsTouch(){
   const [isTouch, setIsTouch] = React.useState(false);
@@ -1028,6 +1097,7 @@ ${u.type}`, icon: MONSTER_ICONS[u.name], on:!!(entryPicks[group]?.has(idx)) }))}
     </div> 
   );
 }
+
 
 
 

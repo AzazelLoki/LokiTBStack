@@ -946,14 +946,7 @@ useEffect(() => {
   </svg>
 </button>
 
-  <button
-    className="btn-back"
-    type="button"
-    title="Contact"
-    onClick={openContact}
-  >
-    Contact
-  </button>
+
 </div>
 
 
@@ -1336,6 +1329,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

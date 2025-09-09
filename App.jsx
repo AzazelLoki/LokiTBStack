@@ -1007,6 +1007,36 @@ useEffect(() => {
   margin-bottom: .15rem;
 }
 
+
+
+/* ===== Taille de police quand il y a des images (tb-media) ===== */
+
+/* Corps du tableau — gros et lisible */
+.tb-media th,
+.tb-media td {
+  /* preset "Grand" — change UNE seule ligne si tu veux +/− grand */
+  font-size: clamp(1.3rem, 2.6vw, 2.1rem) !important;
+  line-height: 1.2;
+}
+
+/* Colonne Image – "buy view" (Type | Image | Count) → l'image est la 2e colonne */
+.tb-media th:nth-child(2),
+.tb-media td:nth-child(2) {
+  font-size: clamp(1rem, 1.4vw, 1.2rem) !important;
+}
+
+/* Colonne Image – liste plate (Level | Type | Image | Count) → l'image est la 3e colonne */
+.tb-media th:nth-child(3),
+.tb-media td:nth-child(3) {
+  font-size: clamp(1rem, 1.4vw, 1.2rem) !important;
+}
+
+/* (Optionnel) En-têtes un peu plus gros */
+.tb-media thead th {
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem) !important;
+}
+
+
 }
 `}</style>
 
@@ -1524,6 +1554,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

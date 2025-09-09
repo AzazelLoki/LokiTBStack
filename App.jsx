@@ -1285,6 +1285,7 @@ useEffect(() => {
 
       {monstersRows.length ? (
         <SimpleTable
+        className="tb-media"
           left
           headers={["Group", "Name", "Image", "Count"]}
           rows={monstersRowsSorted.map(m => {
@@ -1544,6 +1545,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

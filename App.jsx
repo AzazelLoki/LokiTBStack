@@ -993,6 +993,20 @@ useEffect(() => {
     position:fixed; top:12vh; left:50%; transform:translateX(-50%);
     max-width:92vw; max-height:76vh; overflow:auto;
   }
+
+
+  /* Agrandir le texte quand il y a des images dans la table */
+.tb-media td {
+  font-size: clamp(1.05rem, 1.25vw, 1.35rem);
+  line-height: 1.2;
+}
+
+/* Un peu d’air autour des miniatures */
+.tb-media td > img {
+  margin-top: .15rem;
+  margin-bottom: .15rem;
+}
+
 }
 `}</style>
 
@@ -1423,5 +1437,6 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 

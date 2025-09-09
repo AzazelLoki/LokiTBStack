@@ -263,6 +263,70 @@ import { Analytics } from "@vercel/analytics/react";
         "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/M8-Trickster%20I.png?raw=true",
       "Leadership":
         "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/Leadership.png?raw=true",
+      "g1r": 
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g1r.png?raw=true",
+      "g1m":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g1m.png?raw=true",
+      "g1h":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g1h.png?raw=true",
+      "g2r":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g2r.png?raw=true",
+      "g2m":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g2m.png?raw=true",
+      "g2h":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g2h.png?raw=true",
+      "g3r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g3r.png?raw=true",
+      "g3m":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g3m.png?raw=true",
+      "g3h":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g3h.png?raw=true",
+      "g4r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g4r.png?raw=true",
+      "g4m":
+       "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g4m.png?raw=true",
+      "g4h":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g4h.png?raw=true",
+      "g5r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g5r.png?raw=true",
+      "g5m":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g5m.png?raw=true",
+      "g5h":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g5h.png?raw=true",
+      "g5f":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g5f.png?raw=true",
+      "g6r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g6r.png?raw=true",
+      "g6m":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g6m.png?raw=true",
+      "g6h":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g6h.png?raw=true",
+      "g6f":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g6f.png?raw=true",
+      "g7r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g7r.png?raw=true",
+      "g7m":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g7m.png?raw=true",
+      "g7h":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g7h.png?raw=true",
+      "g7f":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g7f.png?raw=true",
+      "g8r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g8r.png?raw=true",
+      "g8m":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g8m.png?raw=true",
+      "g8h":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g8h.png?raw=true",
+      "g8f":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g8f.png?raw=true",
+      "g9r":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g9r.png?raw=true",
+      "g9m":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g9m.png?raw=true",
+      "g9h":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g9h.png?raw=true",
+      "g9f":
+        "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g9f.png?raw=true",
     };
 
 // MERCENAIRES (type|strength|health|ldr)

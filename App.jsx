@@ -1287,38 +1287,125 @@ useEffect(() => {
 </section>
 
 
-        {/* S/G Results */}
-        <section className={`${clsPanel} mx-2`}>
-          <h2 className="text-lg mb-3" style={glow}>SPECIALISTS / GUARDSMEN RESULT</h2>
-          <div className="flex items-center gap-3 mb-2 tb-switch"><span style={glow} className="text-sm opacity-80">S/G Buy view</span><button type="button" role="switch" aria-checked={showSGBuild} className={`tb-toggle ${showSGBuild?'on':''}`} onClick={()=>setShowSGBuild(v=>!v)}><span className="tb-toggle-knob"/></button></div>
-          <div className={`tb-slide ${showSGBuild? 'open':''}`}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-semibold mb-2" style={glow}>Guardsmen</h3>
-                {sgBuild.G.levels.length? sgBuild.G.levels.map(lvl=> (
-                  <div key={lvl} className="mb-3">
-                    <div className="mb-1 font-semibold" style={glow}>{lvl}</div>
-                    <SimpleTable large left headers={["Type","Image","Count"]} rows={sgBuild.G.byLevel[lvl].map(r=>{ const ic=iconFor(r.level,r.type); const img = ic ? (<img src={ic} alt="" className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"/>) : "—"; return [r.type, img, r.troops]; })} />
-                  </div>
-                )) : <div className="opacity-70">—</div>}
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2" style={glow}>Specialists</h3>
-                {sgBuild.S.levels.length? sgBuild.S.levels.map(lvl=> (
-                  <div key={lvl} className="mb-3">
-                    <div className="mb-1 font-semibold" style={glow}>{lvl}</div>
-                    <SimpleTable large left headers={["Type","Image","Count"]} rows={sgBuild.S.byLevel[lvl].map(r=>{ const ic=iconFor(r.level,r.type); const img = ic ? (<img src={ic} alt="" className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"/>) : "—"; return [r.type, img, r.troops]; })} />
-                  </div>
-                )) : <div className="opacity-70">—</div>}
-              </div>
+      {/* S/G Results */}
+<section className={`${clsPanel} mx-2`}>
+  <h2 className="text-lg mb-3" style={glow}>
+    SPECIALISTS / GUARDSMEN RESULT
+  </h2>
+
+  {/* Toggle Buy view */}
+  <div className="flex items-center gap-3 mb-3 tb-switch">
+    <span style={glow} className="text-sm opacity-80">
+      S/G Buy view
+    </span>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={showSGBuild}
+      className={`tb-toggle ${showSGBuild ? "on" : ""}`}
+      onClick={() => setShowSGBuild(v => !v)}
+    >
+      <span className="tb-toggle-knob" />
+    </button>
+  </div>
+
+  {/* === Buy view (par niveaux) === */}
+  <div className={`tb-slide ${showSGBuild ? "open" : ""}`}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Guardsmen */}
+      <div>
+        <h3 className="font-semibold mb-2" style={glow}>Guardsmen</h3>
+
+        {sgBuild.G.levels.length ? (
+          sgBuild.G.levels.map(lvl => (
+            <div key={lvl} className="mb-4">
+              <div className="mb-2 font-semibold" style={glow}>{lvl}</div>
+
+              <SimpleTable
+                className="tb-media"
+                large
+                left
+                headers={["Type", "Image", "Count"]}
+                rows={sgBuild.G.byLevel[lvl].map(r => {
+                  const ic  = iconFor(r.level, r.type);
+                  const img = ic ? (
+                    <img
+                      src={ic}
+                      alt={`${r.level} ${r.type}`}
+                      className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"
+                    />
+                  ) : "—";
+                  return [r.type, img, r.troops];
+                })}
+              />
             </div>
-          </div>
-          {!showSGBuild && ( sg.rows.length? (
-            <SimpleTable large left headers={["Level","Type","Image","Count"]} rows={sgRowsSorted.map(r=>{ const ic=iconFor(r.level,r.type); const img = ic ? (<img src={ic} alt="" className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"/>) : "—"; return [r.level, r.type, img, r.troops]; })} />
-          ): (
-            <div className="opacity-70">No S/G rows yet.</div>
-          ))}
-        </section>
+          ))
+        ) : (
+          <div className="opacity-70">—</div>
+        )}
+      </div>
+
+      {/* Specialists */}
+      <div>
+        <h3 className="font-semibold mb-2" style={glow}>Specialists</h3>
+
+        {sgBuild.S.levels.length ? (
+          sgBuild.S.levels.map(lvl => (
+            <div key={lvl} className="mb-4">
+              <div className="mb-2 font-semibold" style={glow}>{lvl}</div>
+
+              <SimpleTable
+                className="tb-media"
+                large
+                left
+                headers={["Type", "Image", "Count"]}
+                rows={sgBuild.S.byLevel[lvl].map(r => {
+                  const ic  = iconFor(r.level, r.type);
+                  const img = ic ? (
+                    <img
+                      src={ic}
+                      alt={`${r.level} ${r.type}`}
+                      className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"
+                    />
+                  ) : "—";
+                  return [r.type, img, r.troops];
+                })}
+              />
+            </div>
+          ))
+        ) : (
+          <div className="opacity-70">—</div>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* === Liste simple (flat) quand Buy view est OFF === */}
+  {!showSGBuild && (
+    sg.rows.length ? (
+      <SimpleTable
+        className="tb-media"
+        large
+        left
+        headers={["Level", "Type", "Image", "Count"]}
+        rows={sgRowsSorted.map(r => {
+          const ic  = iconFor(r.level, r.type);
+          const img = ic ? (
+            <img
+              src={ic}
+              alt={`${r.level} ${r.type}`}
+              className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"
+            />
+          ) : "—";
+          return [r.level, r.type, img, r.troops];
+        })}
+      />
+    ) : (
+      <div className="opacity-70">No S/G rows yet.</div>
+    )
+  )}
+</section>
+
  
         
 
@@ -1437,6 +1524,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

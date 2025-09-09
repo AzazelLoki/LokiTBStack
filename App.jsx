@@ -993,12 +993,28 @@ useEffect(() => {
     position:fixed; top:12vh; left:50%; transform:translateX(-50%);
     max-width:92vw; max-height:76vh; overflow:auto;
   }
+} /* 👈 on ferme le @media ICI */
 
-
-  /* Agrandir le texte quand il y a des images dans la table */
+/* ===== Tables avec images (applique sur Desktop ET Mobile) ===== */
+.tb-media th,
 .tb-media td {
-  font-size: clamp(1.05rem, 1.25vw, 1.35rem);
+  font-size: clamp(1.25rem, 2.4vw, 2rem) !important; /* texte général + gros */
   line-height: 1.2;
+}
+
+/* Colonne image (2e en Buy view, 3e en liste plate) un peu plus petite */
+.tb-media th:nth-child(2),
+.tb-media td:nth-child(2),
+.tb-media th:nth-child(3),
+.tb-media td:nth-child(3) {
+  font-size: clamp(1rem, 1.6vw, 1.2rem) !important;
+}
+
+/* Dernière colonne = Count : ENCORE plus gros */
+.tb-media th:last-child,
+.tb-media td:last-child {
+  font-size: clamp(1.6rem, 3.2vw, 2.6rem) !important;
+  font-weight: 700;
 }
 
 /* Un peu d’air autour des miniatures */
@@ -1007,36 +1023,10 @@ useEffect(() => {
   margin-bottom: .15rem;
 }
 
-
-
-/* ===== Taille de police quand il y a des images (tb-media) ===== */
-
-/* Corps du tableau — gros et lisible */
-.tb-media th,
-.tb-media td {
-  /* preset "Grand" — change UNE seule ligne si tu veux +/− grand */
-  font-size: clamp(1.3rem, 2.6vw, 2.1rem) !important;
-  line-height: 1.2;
-}
-
-/* Colonne Image – "buy view" (Type | Image | Count) → l'image est la 2e colonne */
-.tb-media th:nth-child(2),
-.tb-media td:nth-child(2) {
-  font-size: clamp(1rem, 1.4vw, 1.2rem) !important;
-}
-
-/* Colonne Image – liste plate (Level | Type | Image | Count) → l'image est la 3e colonne */
-.tb-media th:nth-child(3),
-.tb-media td:nth-child(3) {
-  font-size: clamp(1rem, 1.4vw, 1.2rem) !important;
-}
-
 /* (Optionnel) En-têtes un peu plus gros */
 .tb-media thead th {
   font-size: clamp(1.4rem, 2.8vw, 2.2rem) !important;
 }
-
-
 }
 `}</style>
 
@@ -1554,6 +1544,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

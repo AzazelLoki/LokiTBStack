@@ -795,7 +795,6 @@ const monstersRowsSorted = useMemo(
   const [showTypePicks,setShowTypePicks]=useState(false);
   const [showEntryPicks,setShowEntryPicks]=useState(false);
   const [showSGBuild,setShowSGBuild]=useState(false);
-    onst [showSGBuild,setShowSGBuild]=useState(false
   const [showCalcs,setShowCalcs]=useState(false);
 // ---- Contact modal (email) ----
 const [contactOpen, setContactOpen] = useState(false);
@@ -1546,5 +1545,6 @@ Toggle Buy view
     </div> 
   );
 }
+
 
 

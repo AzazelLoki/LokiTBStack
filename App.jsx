@@ -212,7 +212,7 @@ import { Analytics } from "@vercel/analytics/react";
     );
     
     // 🔹 Monster icon URLs (GitHub raw links)
-    const MONSTER_ICONS = {
+    const TB_ICONS = {
       "Water Elemental":
         "https://raw.githubusercontent.com/AzazelLoki/Loki_tb-icons/refs/heads/main/M3-WaterElemental.png",
       "Battle Boar":
@@ -971,9 +971,9 @@ useEffect(() => {
   </span>
 
   {/* utilise ta map d’icônes */}
-  {MONSTER_ICONS["Leadership"] && (
+  {TB_ICONS["Leadership"] && (
     <HoverImageHelp
-      src={MONSTER_ICONS["Leadership"]}
+      src={TB_ICONS["Leadership"]}
       alt="Leadership"
     />
   )}
@@ -1116,7 +1116,7 @@ useEffect(() => {
             options={MONSTERS[group].map((u, idx) => ({
               key: `${group}:${idx}`,
               text: `${u.name} ${u.type}`,
-              icon: MONSTER_ICONS[u.name],
+              icon: TB_ICONS[u.name],
               on: !!(entryPicks[group]?.has(idx)),
             }))}
             onClick={(key) => {
@@ -1160,7 +1160,7 @@ useEffect(() => {
           left
           headers={["Group", "Name", "Image", "Count"]}
           rows={monstersRowsSorted.map(m => {
-            const imgSrc = MONSTER_ICONS[m.name] || null;
+            const imgSrc = TB_ICONS[m.name] || null;
             const imgTag = imgSrc ? (
               <img
                 src={imgSrc}
@@ -1329,53 +1329,3 @@ useEffect(() => {
     </div> 
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

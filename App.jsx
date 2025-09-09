@@ -795,6 +795,7 @@ const monstersRowsSorted = useMemo(
   const [showTypePicks,setShowTypePicks]=useState(false);
   const [showEntryPicks,setShowEntryPicks]=useState(false);
   const [showSGBuild,setShowSGBuild]=useState(false);
+    onst [showSGBuild,setShowSGBuild]=useState(false
   const [showCalcs,setShowCalcs]=useState(false);
 // ---- Contact modal (email) ----
 const [contactOpen, setContactOpen] = useState(false);
@@ -1318,21 +1319,7 @@ useEffect(() => {
     SPECIALISTS / GUARDSMEN RESULT
   </h2>
 
-  {/* Toggle Buy view */}
-  <div className="flex items-center gap-3 mb-3 tb-switch">
-    <span style={glow} className="text-sm opacity-80">
-      S/G Buy view
-    </span>
-    <button
-      type="button"
-      role="switch"
-      aria-checked={showSGBuild}
-      className={`tb-toggle ${showSGBuild ? "on" : ""}`}
-      onClick={() => setShowSGBuild(v => !v)}
-    >
-      <span className="tb-toggle-knob" />
-    </button>
-  </div>
+Toggle Buy view
 
   {/* === Buy view (par niveaux) === */}
   <div className={`tb-slide ${showSGBuild ? "open" : ""}`}>
@@ -1352,18 +1339,19 @@ useEffect(() => {
                 left
                 headers={["Level", "Unit", "Count"]}
                 rows={sgBuild.G.byLevel[lvl].map(r => {
-                  const ic  = iconFor(r.level, r.type);
-                  const unit = ic ? (
-                    <div className="unit">
-                      <img
-                        src={ic}
-                        alt={`${r.level} ${r.type}`}
-                        className="tb-icon-sm"
-                      />
-                    </div>
-                  ) : r.type; // fallback texte
-                  return [r.level, unit, r.troops];
-                })}
+  const ic  = iconFor(r.level, r.type);
+  const unit = (showUnitImages && ic) ? (
+    <div className="unit">
+      <img
+        src={ic}
+        alt={`${r.level} ${r.type}`}
+        className="tb-icon-sm"
+      />
+    </div>
+  ) : r.type; // fallback texte
+  return [r.level, unit, r.troops];
+})}
+
               />
             </div>
           ))
@@ -1386,19 +1374,21 @@ useEffect(() => {
                 large
                 left
                 headers={["Level", "Unit", "Count"]}
-                rows={sgBuild.S.byLevel[lvl].map(r => {
-                  const ic  = iconFor(r.level, r.type);
-                  const unit = ic ? (
-                    <div className="unit">
-                      <img
-                        src={ic}
-                        alt={`${r.level} ${r.type}`}
-                        className="tb-icon-sm"
-                      />
-                    </div>
-                  ) : r.type;
-                  return [r.level, unit, r.troops];
-                })}
+              rows={sgBuild.S.byLevel[lvl].map(r => {
+  const ic  = iconFor(r.level, r.type);
+  const unit = (showUnitImages && ic) ? (
+    <div className="unit">
+      <img
+        src={ic}
+        alt={`${r.level} ${r.type}`}
+        className="tb-icon-sm"
+      />
+    </div>
+  ) : r.type;
+  return [r.level, unit, r.troops];
+})}
+
+
               />
             </div>
           ))
@@ -1418,18 +1408,19 @@ useEffect(() => {
         left
         headers={["Level", "Unit", "Count"]}
         rows={sgRowsSorted.map(r => {
-          const ic  = iconFor(r.level, r.type);
-          const unit = ic ? (
-            <div className="unit">
-              <img
-                src={ic}
-                alt={`${r.level} ${r.type}`}
-                className="tb-icon-sm"
-              />
-            </div>
-          ) : r.type;
-          return [r.level, unit, r.troops];
-        })}
+  const ic  = iconFor(r.level, r.type);
+  const unit = (showUnitImages && ic) ? (
+    <div className="unit">
+      <img
+        src={ic}
+        alt={`${r.level} ${r.type}`}
+        className="tb-icon-sm"
+      />
+    </div>
+  ) : r.type;
+  return [r.level, unit, r.troops];
+})}
+
       />
     ) : (
       <div className="opacity-70">No S/G rows yet.</div>
@@ -1555,4 +1546,5 @@ useEffect(() => {
     </div> 
   );
 }
+
 

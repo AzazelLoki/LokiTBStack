@@ -329,6 +329,26 @@ import { Analytics } from "@vercel/analytics/react";
         "https://github.com/AzazelLoki/Loki_tb-icons/blob/main/g9f.png?raw=true",
     };
 
+// Map des types vers une lettre utilisée dans TB_ICONS
+const TYPE_LETTER = {
+  ranged:  "r",
+  melee:   "m",
+  mounted: "h",   // "h" pour horse/mounted (tes fichiers g?h.png)
+  flying:  "f",
+  scout:   "s"    // pour S3/S4 "scout"
+};
+
+// Construit la clé TB_ICONS pour une unité S/G 
+const sgTBIconKey = (level, type) => {
+  if (!level || !type) return null;
+  const prefix = level[0].toLowerCase(); // 'g' ou 's'
+  const num    = level.slice(1);         // "2".."9"
+  const letter = TYPE_LETTER[type];
+  if (!letter) return null;
+  return `${prefix}${num}${letter}`;
+};
+
+
 // MERCENAIRES (type|strength|health|ldr)
     const MERC_CSV = [
       // — Mercenaires “monsters”
@@ -665,7 +685,16 @@ export default function TBStackCalculator(){
   const [typePicks,setTypePicks]=useState({});
   const [userIcons,setUserIcons]=useState(()=>{ try{return JSON.parse(localStorage.getItem('tb_user_icons_v1')||'{}')}catch{return {}} });
   const setIcon=(key,dataUrl)=>{ const next={...userIcons,[key]:dataUrl}; setUserIcons(next); try{ localStorage.setItem('tb_user_icons_v1', JSON.stringify(next)); }catch{} };
-  const iconFor=(level,type)=> userIcons[`${level}|${type}`] || null;
+ const iconFor = (level, type) => {
+  // 1) Essayer dans TB_ICONS avec une clé standard (g8m, s7f, etc.)
+  try {
+    const key = sgTBIconKey(level, type);
+    if (key && TB_ICONS[key]) return TB_ICONS[key];
+  } catch {}
+
+  // 2) Sinon, retomber sur l'icône utilisateur (localStorage) si présente
+  return userIcons[`${level}|${type}`] || null;
+};
   const [showIcons,setShowIcons]=useState(false);
   const toggleType=(tier,type)=> setTypePicks(p=>{ const cur=new Set(p[tier]||[]); cur.has(type)?(cur.delete(type),sfx.deselect()):(cur.add(type),sfx.select()); return {...p,[tier]:cur}; });
   const picksSigSG=useMemo(()=>Object.entries(typePicks).map(([k,s])=>k+":"+Array.from(s).sort().join('.')).sort().join('|'),[typePicks]);
@@ -1393,3 +1422,4 @@ useEffect(() => {
     </div> 
   );
 }
+

@@ -571,12 +571,12 @@ function Buttons({
 
 
 // ==================== SimpleTable ====================
-function SimpleTable({ headers = [], rows = [], left, large }) {
+function SimpleTable({ headers = [], rows = [], left, large, className = "" }) {
   const tableSize = large ? "text-lg md:text-2xl" : "text-base md:text-lg";
   const formatCell = (v) => (Number.isFinite(v) ? Math.floor(v).toLocaleString() : v);
 
   return (
-    <table className={`w-full ${tableSize} border border-[#9f7c5e]`}>
+    <table className={`w-full ${tableSize} border border-[#9f7c5e] ${className}`}>
       <thead>
         <tr>
           {headers.map((h, i) => (
@@ -589,7 +589,7 @@ function SimpleTable({ headers = [], rows = [], left, large }) {
           <tr key={i} className="hover:bg-[#f1debd]">
             {r.map((c, j) => (
               <td key={j} className={left && j === 0 ? tdL : td}>
-                {formatCell(c)}
+                {Number.isFinite(c) ? Math.floor(c).toLocaleString() : c}
               </td>
             ))}
           </tr>
@@ -598,6 +598,7 @@ function SimpleTable({ headers = [], rows = [], left, large }) {
     </table>
   );
 }
+
 
 // -------------------- ToolTip --------------------
 function useIsTouch(){
@@ -1422,4 +1423,5 @@ useEffect(() => {
     </div> 
   );
 }
+
 

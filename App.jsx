@@ -817,6 +817,16 @@ const handleSend = (e) => {
   sfx.select();
   setContactOpen(false);
 };
+// Afficher ou non les images dans les résultats S/G
+const [showUnitImages, setShowUnitImages] = useState(() => {
+  try { return JSON.parse(localStorage.getItem('tb_show_unit_images_v1') ?? 'true'); }
+  catch { return true; }
+});
+useEffect(() => {
+  try { localStorage.setItem('tb_show_unit_images_v1', JSON.stringify(showUnitImages)); } catch {}
+}, [showUnitImages]);
+
+    
 
 // Close on Escape (optional)
 useEffect(() => {
@@ -1545,3 +1555,4 @@ useEffect(() => {
     </div> 
   );
 }
+

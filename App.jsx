@@ -1,5 +1,3 @@
-
-
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Analytics } from "@vercel/analytics/react";
 // ==============================================================
@@ -995,38 +993,36 @@ useEffect(() => {
   }
 } /* 👈 on ferme le @media ICI */
 
-/* ===== Tables avec images (applique sur Desktop ET Mobile) ===== */
+/* ===== Tables 3 colonnes: Level | Unit | Count ===== */
 .tb-media th,
 .tb-media td {
-  font-size: clamp(1.25rem, 2.4vw, 2rem) !important; /* texte général + gros */
-  line-height: 1.2;
+  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
+  line-height: 1.25;
 }
 
-/* Colonne image (2e en Buy view, 3e en liste plate) un peu plus petite */
-.tb-media th:nth-child(2),
-.tb-media td:nth-child(2),
-.tb-media th:nth-child(3),
-.tb-media td:nth-child(3) {
-  font-size: clamp(1rem, 1.6vw, 1.2rem) !important;
-}
-
-/* Dernière colonne = Count : ENCORE plus gros */
 .tb-media th:last-child,
 .tb-media td:last-child {
-  font-size: clamp(1.6rem, 3.2vw, 2.6rem) !important;
-  font-weight: 700;
+  /* Count un poil plus gros */
+  font-size: clamp(1.5rem, 2.8vw, 2.4rem) !important;
+  font-weight: 800;
 }
 
-/* Un peu d’air autour des miniatures */
-.tb-media td > img {
-  margin-top: .15rem;
-  margin-bottom: .15rem;
+/* Présentation de la cellule "Unit" (image centrée) */
+.tb-media .unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tb-media .unit img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: .5rem;
 }
 
-/* (Optionnel) En-têtes un peu plus gros */
+/* En-têtes un peu plus gros */
 .tb-media thead th {
-  font-size: clamp(1.4rem, 2.8vw, 2.2rem) !important;
-}
+  font-size: clamp(1.4rem, 2.6vw, 2.2rem) !important;
 }
 `}</style>
 
@@ -1279,25 +1275,23 @@ useEffect(() => {
       </div>
     )}
 
-    {/* Monsters à droite */}
+    {/* Monsters à droite — 3 colonnes Level | Unit | Count */}
     <div>
       <h3 className="font-semibold mb-3" style={glow}>Monsters</h3>
 
       {monstersRows.length ? (
         <SimpleTable
-        className="tb-media"
+          className="tb-media"
           left
-          headers={["Group", "Name", "Image", "Count"]}
+          headers={["Level", "Unit", "Count"]}
           rows={monstersRowsSorted.map(m => {
             const imgSrc = TB_ICONS[m.name] || null;
-            const imgTag = imgSrc ? (
-              <img
-                src={imgSrc}
-                alt={m.name}
-                className="tb-icon-sm w-[96px] h-[96px] rounded-lg object-contain mx-auto"
-              />
-            ) : "—";
-            return [m.group, m.name, imgTag, m.count];
+            const unit = imgSrc ? (
+              <div className="unit">
+                <img src={imgSrc} alt={m.name} className="tb-icon-sm" />
+              </div>
+            ) : m.name; // fallback texte si pas d'image
+            return [m.group, unit, m.count];
           })}
         />
       ) : (
@@ -1346,17 +1340,19 @@ useEffect(() => {
                 className="tb-media"
                 large
                 left
-                headers={["Type", "Image", "Count"]}
+                headers={["Level", "Unit", "Count"]}
                 rows={sgBuild.G.byLevel[lvl].map(r => {
                   const ic  = iconFor(r.level, r.type);
-                  const img = ic ? (
-                    <img
-                      src={ic}
-                      alt={`${r.level} ${r.type}`}
-                      className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"
-                    />
-                  ) : "—";
-                  return [r.type, img, r.troops];
+                  const unit = ic ? (
+                    <div className="unit">
+                      <img
+                        src={ic}
+                        alt={`${r.level} ${r.type}`}
+                        className="tb-icon-sm"
+                      />
+                    </div>
+                  ) : r.type; // fallback texte
+                  return [r.level, unit, r.troops];
                 })}
               />
             </div>
@@ -1379,17 +1375,19 @@ useEffect(() => {
                 className="tb-media"
                 large
                 left
-                headers={["Type", "Image", "Count"]}
+                headers={["Level", "Unit", "Count"]}
                 rows={sgBuild.S.byLevel[lvl].map(r => {
                   const ic  = iconFor(r.level, r.type);
-                  const img = ic ? (
-                    <img
-                      src={ic}
-                      alt={`${r.level} ${r.type}`}
-                      className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"
-                    />
-                  ) : "—";
-                  return [r.type, img, r.troops];
+                  const unit = ic ? (
+                    <div className="unit">
+                      <img
+                        src={ic}
+                        alt={`${r.level} ${r.type}`}
+                        className="tb-icon-sm"
+                      />
+                    </div>
+                  ) : r.type;
+                  return [r.level, unit, r.troops];
                 })}
               />
             </div>
@@ -1408,17 +1406,19 @@ useEffect(() => {
         className="tb-media"
         large
         left
-        headers={["Level", "Type", "Image", "Count"]}
+        headers={["Level", "Unit", "Count"]}
         rows={sgRowsSorted.map(r => {
           const ic  = iconFor(r.level, r.type);
-          const img = ic ? (
-            <img
-              src={ic}
-              alt={`${r.level} ${r.type}`}
-              className="tb-icon-sm w-20 h-20 md:w-24 md:h-24 rounded-lg object-contain shrink-0 mx-auto"
-            />
-          ) : "—";
-          return [r.level, r.type, img, r.troops];
+          const unit = ic ? (
+            <div className="unit">
+              <img
+                src={ic}
+                alt={`${r.level} ${r.type}`}
+                className="tb-icon-sm"
+              />
+            </div>
+          ) : r.type;
+          return [r.level, unit, r.troops];
         })}
       />
     ) : (
@@ -1545,10 +1545,3 @@ useEffect(() => {
     </div> 
   );
 }
-
-
-
-
-
-
-

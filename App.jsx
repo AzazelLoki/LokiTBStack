@@ -1111,15 +1111,15 @@ export default function TBStackCalculator(){
 /* ===== Tables 3 colonnes: Level | Unit | Count ===== */
 .tb-media th,
 .tb-media td {
-  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
+  font-size: clamp(1.25rem, 1.5vw, 1.5rem) !important;
   line-height: 1.25;
 }
 
 .tb-media th:last-child,
 .tb-media td:last-child {
   /* Count un poil plus gros */
-  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
-  font-weight: 700;
+  font-size: clamp(1.25rem, 1.5vw, 1.5rem) !important;
+  font-weight: 600;
 }
 
 /* Présentation de la cellule "Unit" (image centrée) */
@@ -1137,7 +1137,7 @@ export default function TBStackCalculator(){
 
 /* En-têtes un peu plus gros */
 .tb-media thead th {
-  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
+  font-size: clamp(1.25rem, 1.5vw, 1.5rem) !important;
 }
 `}</style>
 
@@ -1676,6 +1676,7 @@ export default function TBStackCalculator(){
     </div> 
   );
 }
+
 
 
 

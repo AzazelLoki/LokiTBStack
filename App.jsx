@@ -948,7 +948,7 @@ import { Analytics } from "@vercel/analytics/react";
       
 
 
-// INTERFACE WEB =================================================================== 
+ {/* INTERFACE WEB =================================================================== */}*
    <style>{`   
     // 1) Animations
   
@@ -1626,4 +1626,5 @@ import { Analytics } from "@vercel/analytics/react";
 }
 
 // FIN
+
 

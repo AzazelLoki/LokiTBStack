@@ -1614,82 +1614,15 @@ import { Analytics } from "@vercel/analytics/react";
           </div>
         )}
 
-{/* Contact Modal */}
-{contactOpen && (
-  <div
-    className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-[2px] flex items-center justify-center px-3"
-    role="dialog"
-    aria-modal="true"
-    onClick={(e) => { if (e.target === e.currentTarget) closeContact(); }}
-  >
-    <div className={`${clsPanel} w-full max-w-lg relative`}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xl md:text-2xl" style={glow}>Contact</h3>
-        <button className="tb-close" aria-label="Close" onClick={closeContact}>×</button>
-      </div>
-
-      <form onSubmit={handleSend} className="space-y-3">
-        <div>
-          <label className="block text-sm opacity-80 mb-1" style={glow}>Your email (optional)</label>
-          <input
-            type="email"
-            value={contact.from}
-            onChange={(e) => setContact(p => ({ ...p, from: e.target.value }))}
-            className="w-full bg-[#f1debd] text-[#5b2a17] border border-[#9f7c5e] rounded px-3 py-2 focus:outline-none"
-            placeholder="you@domain.com"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm opacity-80 mb-1" style={glow}>Subject</label>
-          <input
-            required
-            value={contact.subject}
-            onChange={(e) => setContact(p => ({ ...p, subject: e.target.value }))}
-            className="w-full bg-[#f1debd] text-[#5b2a17] border border-[#9f7c5e] rounded px-3 py-2 focus:outline-none"
-            placeholder="Subject"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm opacity-80 mb-1" style={glow}>Message</label>
-          <textarea
-            required
-            rows={6}
-            value={contact.message}
-            onChange={(e) => setContact(p => ({ ...p, message: e.target.value }))}
-            className="w-full bg-[#f1debd] text-[#5b2a17] border border-[#9f7c5e] rounded px-3 py-2 focus:outline-none"
-            placeholder="Your message…"
-          />
-        </div>
-
-        <div className="flex items-center justify-end gap-2 pt-1">
-          <button type="button" className="btn-back" onClick={closeContact}>Cancel</button>
-          <button type="submit" className="btn-back" onClick={() => sfx.select()}>Send</button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-
+// SIGNATURE 
         
       {/* LØKI */}
       <div className="fixed bottom-4 right-4 z-[60] select-none">
-        <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle">LØKI</span></div>
+        <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle">Løki</span></div>
       </div>
       <Analytics />
     </div> 
   );
 }
 
-
-
-
-
-
-
-
-
-
-
+// FIN

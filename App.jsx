@@ -677,19 +677,20 @@ function HoverImageHelp({ src, alt = "Help" }) {
 }
 
 // -------------------- App --------------------
-export default function TBStackCalculator() {
+export default function TBStackCalculator(){
   const sfx = useTBSfx();
 
-  // -------- State de base
+  // 1) Inputs & core
   const [ldrInput, setLdrInput] = useState("");
   const L = useMemo(() => parseNumber(ldrInput), [ldrInput]);
 
+  // 2) SG selections
   const [selected, setSelected] = useState(
     Object.fromEntries([...GUARDSMEN, ...SPECIALISTS].map(k => [k, false]))
   );
   const [typePicks, setTypePicks] = useState({});
 
-  // -------- Icônes (lib par défaut + custom user)
+  // 3) Icons (lib par défaut + custom user)
   const [userIcons, setUserIcons] = useState(() => {
     try { return JSON.parse(localStorage.getItem("tb_user_icons_v1") || "{}"); }
     catch { return {}; }
@@ -708,22 +709,24 @@ export default function TBStackCalculator() {
   };
   const [showIcons, setShowIcons] = useState(false);
 
-  // -------- Sélections S/G
-  const toggleType = (tier, type) =>
+  // 4) Picks helpers
+  const toggleType = (tier, type) => {
     setTypePicks(p => {
       const cur = new Set(p[tier] || []);
       cur.has(type) ? (cur.delete(type), sfx.deselect()) : (cur.add(type), sfx.select());
       return { ...p, [tier]: cur };
     });
+  };
   const picksSigSG = useMemo(
     () =>
       Object.entries(typePicks)
-        .map(([k, s]) => k + ":" + Array.from(s).sort().join("."))
+        .map(([k, s]) => `${k}:${Array.from(s).sort().join(".")}`)
         .sort()
         .join("|"),
     [typePicks]
   );
 
+  // 5) Computations
   const sg = useMemo(() => computeSG(L, selected, typePicks), [L, selected, picksSigSG]);
   const sgRowsSorted = useMemo(
     () =>
@@ -731,8 +734,8 @@ export default function TBStackCalculator() {
         (a, b) =>
           b.unitStrength - a.unitStrength ||
           b.totalStrength - a.totalStrength ||
-          String(b.level).localeCompare(String(a.level)) ||
-          String(b.type).localeCompare(String(a.type))
+          String(a.level).localeCompare(String(b.level)) ||
+          String(a.type).localeCompare(String(b.type))
       ),
     [sg.rows]
   );
@@ -756,24 +759,24 @@ export default function TBStackCalculator() {
     return { G: make("G"), S: make("S") };
   }, [sg.rows]);
 
-  // -------- Monstres
+  // 6) Monsters
   const [monsterFull, setMonsterFull] = useState(
     Object.fromEntries(MON_GROUPS.map(k => [k, false]))
   );
   const fullSelectedOrdered = ORDER_MONSTERS.filter(g => monsterFull[g]);
-  const partialGroup = nextLowerGroupOf(fullSelectedOrdered); // ok si pas utilisé
 
   const [entryPicks, setEntryPicks] = useState({});
-  const toggleEntry = (group, idx) =>
+  const toggleEntry = (group, idx) => {
     setEntryPicks(p => {
       const cur = new Set(p[group] || []);
       cur.has(idx) ? (cur.delete(idx), sfx.deselect()) : (cur.add(idx), sfx.select());
       return { ...p, [group]: cur };
     });
+  };
   const picksSignature = useMemo(
     () =>
       Object.entries(entryPicks)
-        .map(([g, s]) => g + ":" + Array.from(s).sort().join("."))
+        .map(([g, s]) => `${g}:${Array.from(s).sort().join(".")}`)
         .sort()
         .join("|"),
     [entryPicks]
@@ -782,6 +785,7 @@ export default function TBStackCalculator() {
   const anchors = useMemo(() => computeAnchors(L, sg.SR), [L, sg.SR]);
   const hasLeadership = L > 0;
 
+  // Bubble/Toast
   const [bubble, setBubble] = useState(null);
   const [toast, setToast] = useState(null);
   useEffect(() => {
@@ -840,7 +844,7 @@ export default function TBStackCalculator() {
     [monstersRows]
   );
 
-  // -------- Mercenaires
+  // 7) Mercs
   const mercRows = useMemo(
     () =>
       !anchors.Imerc
@@ -856,7 +860,7 @@ export default function TBStackCalculator() {
   const hasMercResults = useMemo(() => mercRows.some(r => r.count > 0), [mercRows]);
   const mercRowsNZ = useMemo(() => mercRows.filter(r => r.count > 0), [mercRows]);
 
-  // -------- Totaux / SR breakdown
+  // 8) Totaux / SR
   const srTerms = useMemo(
     () =>
       ORDER.filter(k => selected[k]).flatMap(level => {
@@ -892,12 +896,12 @@ export default function TBStackCalculator() {
     [mercRowsNZ]
   );
 
-  // -------- Switchs d’UI
+  // 9) Switchs UI
   const [showTypePicks, setShowTypePicks] = useState(false);
   const [showEntryPicks, setShowEntryPicks] = useState(false);
   const [showSGBuild, setShowSGBuild] = useState(false);
 
-  // ✅ Afficher ou non les images dans les résultats S/G (persisté)
+  // ✅ Toggle images S/G (persisté)
   const [showUnitImages, setShowUnitImages] = useState(() => {
     try { return JSON.parse(localStorage.getItem("tb_show_unit_images_v1") ?? "true"); }
     catch { return true; }
@@ -908,10 +912,33 @@ export default function TBStackCalculator() {
 
   const [showCalcs, setShowCalcs] = useState(false);
 
+  // 10) Contact modal
+  const [contactOpen, setContactOpen] = useState(false);
+  const [contact, setContact] = useState({ from: "", subject: "", message: "" });
+  const RECEIVER_EMAIL = "your.address@email";
+  const openContact = () => { sfx.select(); setContactOpen(true); };
+  const closeContact = () => { sfx.deselect(); setContactOpen(false); };
+  const handleSend = (e) => {
+    e.preventDefault();
+    const body = `${contact.message}\n\n---\nFrom: ${contact.from || "(no email)"}`;
+    const mailto =
+      `mailto:${RECEIVER_EMAIL}?subject=${encodeURIComponent(contact.subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    sfx.select();
+    setContactOpen(false);
+  };
 
+  // Fermer le modal sur Escape
+  useEffect(() => {
+    if (!contactOpen) return;
+    const onKey = (e) => e.key === "Escape" && closeContact();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [contactOpen]);
 
- 
-}
+  // 👉 IMPORTANT : ne ferme PAS la fonction ici.
+  // Le `return ( ... )` avec tout ton JSX arrive juste après ce bloc.
+
 
 
 
@@ -1649,6 +1676,7 @@ export default function TBStackCalculator() {
     </div> 
   );
 }
+
 
 
 

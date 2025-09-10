@@ -211,6 +211,8 @@ import { Analytics } from "@vercel/analytics/react";
     
     // 🔹 Monster icon URLs (GitHub raw links)
     const TB_ICONS = {
+      "LOKI":
+        "https://raw.githubusercontent.com/AzazelLoki/Loki_tb-icons/refs/heads/main/LOKI.png",
       "Water Elemental":
         "https://raw.githubusercontent.com/AzazelLoki/Loki_tb-icons/refs/heads/main/M3-WaterElemental.png",
       "Battle Boar":
@@ -1677,6 +1679,7 @@ export default function TBStackCalculator(){
     </div> 
   );
 }
+
 
 
 

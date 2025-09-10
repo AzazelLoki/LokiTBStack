@@ -795,6 +795,7 @@ const monstersRowsSorted = useMemo(
   const [showTypePicks,setShowTypePicks]=useState(false);
   const [showEntryPicks,setShowEntryPicks]=useState(false);
   const [showSGBuild,setShowSGBuild]=useState(false);
+  const [showUnitImages,setShowUnitImages]=useState(true);
   const [showCalcs,setShowCalcs]=useState(false);
 // ---- Contact modal (email) ----
 const [contactOpen, setContactOpen] = useState(false);
@@ -1312,13 +1313,42 @@ useEffect(() => {
 </section>
 
 
-      {/* S/G Results */}
+{/* S/G Results */}
 <section className={`${clsPanel} mx-2`}>
   <h2 className="text-lg mb-3" style={glow}>
     SPECIALISTS / GUARDSMEN RESULT
   </h2>
 
-Toggle Buy view
+  {/* Toolbar à droite : Buy view + Afficher les images */}
+  <div className="flex items-center justify-end gap-6 mb-3">
+    {/* Switch Buy view */}
+    <div className="tb-switch flex items-center gap-2">
+      <span style={glow} className="text-sm opacity-80">S/G Buy view</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={showSGBuild}
+        className={`tb-toggle ${showSGBuild ? "on" : ""}`}
+        onClick={() => setShowSGBuild(v => !v)}
+      >
+        <span className="tb-toggle-knob" />
+      </button>
+    </div>
+
+    {/* Switch Afficher les images (S/G) */}
+    <div className="tb-switch flex items-center gap-2">
+      <span style={glow} className="text-sm opacity-80">Afficher les images (S/G)</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={showUnitImages}
+        className={`tb-toggle ${showUnitImages ? "on" : ""}`}
+        onClick={() => setShowUnitImages(v => !v)}
+      >
+        <span className="tb-toggle-knob" />
+      </button>
+    </div>
+  </div>
 
   {/* === Buy view (par niveaux) === */}
   <div className={`tb-slide ${showSGBuild ? "open" : ""}`}>
@@ -1328,7 +1358,7 @@ Toggle Buy view
         <h3 className="font-semibold mb-2" style={glow}>Guardsmen</h3>
 
         {sgBuild.G.levels.length ? (
-          sgBuild.G.levels.map(lvl => (
+          sgBuild.G.levels.map((lvl) => (
             <div key={lvl} className="mb-4">
               <div className="mb-2 font-semibold" style={glow}>{lvl}</div>
 
@@ -1337,20 +1367,19 @@ Toggle Buy view
                 large
                 left
                 headers={["Level", "Unit", "Count"]}
-                rows={sgBuild.G.byLevel[lvl].map(r => {
-  const ic  = iconFor(r.level, r.type);
-  const unit = (showUnitImages && ic) ? (
-    <div className="unit">
-      <img
-        src={ic}
-        alt={`${r.level} ${r.type}`}
-        className="tb-icon-sm"
-      />
-    </div>
-  ) : r.type; // fallback texte
-  return [r.level, unit, r.troops];
-})}
-
+                rows={sgBuild.G.byLevel[lvl].map((r) => {
+                  const ic = iconFor(r.level, r.type);
+                  const unit = (showUnitImages && ic) ? (
+                    <div className="unit">
+                      <img
+                        src={ic}
+                        alt={`${r.level} ${r.type}`}
+                        className="tb-icon-sm"
+                      />
+                    </div>
+                  ) : r.type; // fallback texte si pas d'image
+                  return [r.level, unit, r.troops];
+                })}
               />
             </div>
           ))
@@ -1364,7 +1393,7 @@ Toggle Buy view
         <h3 className="font-semibold mb-2" style={glow}>Specialists</h3>
 
         {sgBuild.S.levels.length ? (
-          sgBuild.S.levels.map(lvl => (
+          sgBuild.S.levels.map((lvl) => (
             <div key={lvl} className="mb-4">
               <div className="mb-2 font-semibold" style={glow}>{lvl}</div>
 
@@ -1373,21 +1402,19 @@ Toggle Buy view
                 large
                 left
                 headers={["Level", "Unit", "Count"]}
-              rows={sgBuild.S.byLevel[lvl].map(r => {
-  const ic  = iconFor(r.level, r.type);
-  const unit = (showUnitImages && ic) ? (
-    <div className="unit">
-      <img
-        src={ic}
-        alt={`${r.level} ${r.type}`}
-        className="tb-icon-sm"
-      />
-    </div>
-  ) : r.type;
-  return [r.level, unit, r.troops];
-})}
-
-
+                rows={sgBuild.S.byLevel[lvl].map((r) => {
+                  const ic = iconFor(r.level, r.type);
+                  const unit = (showUnitImages && ic) ? (
+                    <div className="unit">
+                      <img
+                        src={ic}
+                        alt={`${r.level} ${r.type}`}
+                        className="tb-icon-sm"
+                      />
+                    </div>
+                  ) : r.type; // fallback texte
+                  return [r.level, unit, r.troops];
+                })}
               />
             </div>
           ))
@@ -1406,26 +1433,26 @@ Toggle Buy view
         large
         left
         headers={["Level", "Unit", "Count"]}
-        rows={sgRowsSorted.map(r => {
-  const ic  = iconFor(r.level, r.type);
-  const unit = (showUnitImages && ic) ? (
-    <div className="unit">
-      <img
-        src={ic}
-        alt={`${r.level} ${r.type}`}
-        className="tb-icon-sm"
-      />
-    </div>
-  ) : r.type;
-  return [r.level, unit, r.troops];
-})}
-
+        rows={sgRowsSorted.map((r) => {
+          const ic = iconFor(r.level, r.type);
+          const unit = (showUnitImages && ic) ? (
+            <div className="unit">
+              <img
+                src={ic}
+                alt={`${r.level} ${r.type}`}
+                className="tb-icon-sm"
+              />
+            </div>
+          ) : r.type; // fallback texte
+          return [r.level, unit, r.troops];
+        })}
       />
     ) : (
       <div className="opacity-70">No S/G rows yet.</div>
     )
   )}
 </section>
+
 
  
         
@@ -1545,6 +1572,7 @@ Toggle Buy view
     </div> 
   );
 }
+
 
 
 

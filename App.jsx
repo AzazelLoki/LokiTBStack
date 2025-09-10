@@ -1187,7 +1187,7 @@ import { Analytics } from "@vercel/analytics/react";
           </svg>
         </button>   
         </div>
-            </div
+            </div>
 
 // CHAMPS LEADERSHIP       
             <div className="h-[3px] bg-[linear-gradient(90deg,#caa85e,#f5e4a3,#d1a640,#f0d38f,#caa85e)] shadow-[0_2px_8px_rgba(208,173,96,0.5)]"></div>
@@ -1682,6 +1682,7 @@ import { Analytics } from "@vercel/analytics/react";
     </div> 
   );
 }
+
 
 
 

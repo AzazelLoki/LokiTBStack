@@ -1129,13 +1129,13 @@ import { Analytics } from "@vercel/analytics/react";
         }
         `}</style>
         
-//========================================================================================================
-  TB STACKCALULATOR - ELEMENT VISIBLE PAGE WEB      
-//========================================================================================================
+ {/*//========================================================================================================*/}
+  {/* TB STACKCALULATOR - ELEMENT VISIBLE PAGE WEB */}     
+ {/*//========================================================================================================*/}
 
-// ENTRÉE DE DONNÉES--------------------------------------------------------------------------------
+ {/*// ENTRÉE DE DONNÉES-------------------------------------------------------------------------------- */}
         
-// BOUTON "?"       
+ {/* BOUTON "?" */}*      
 
     {bubble && (
       <div
@@ -1149,20 +1149,20 @@ import { Analytics } from "@vercel/analytics/react";
       </div>
     )}
 
-// EN TÊTE 
+ {/* EN TÊTE */}
         
       <div className="max-w-6xl mx-auto space-y-6 relative">
         <header className="fixed top-0 left-0 right-0 z-[120]">
           <div className="w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-[linear-gradient(90deg,#5b2a17_0%,#6b2417_20%,#80301d_50%,#6b2417_80%,#5b2a17_100%)] border-t border-[#5b2a17] shadow-[0_6px_20px_rgba(128,48,29,0.45),inset_0_1px_0_rgba(255,255,255,0.08)]">
             <div className="max-w-6xl mx-auto flex items-center justify-between py-3 px-4">
               <div className="flex items-center gap-3">
-// TITRE
+ {/* TITRE*/}
                 <h1 className="text-2xl md:text-3xl tracking-wide text-[#f1debd]" style={glow}>TB - STACK CALCULATOR</h1>
-// VERSION
+ {/*VERSION*/}
                 <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#1f4318] border border-[#4d7139] text-[#f1debd] text-sm font-semibold leading-none">V0,8</span>
               </div>
 
-// BOUTON RESET
+ {/*BOUTON RESET */}
         <div className="flex items-center gap-2">
          <button
           type="button"
@@ -1189,7 +1189,7 @@ import { Analytics } from "@vercel/analytics/react";
         </div>
             </div>
 
-// CHAMPS LEADERSHIP       
+ {/* CHAMPS LEADERSHIP */}      
             <div className="h-[3px] bg-[linear-gradient(90deg,#caa85e,#f5e4a3,#d1a640,#f0d38f,#caa85e)] shadow-[0_2px_8px_rgba(208,173,96,0.5)]"></div>
           </div>
         </header>
@@ -1209,7 +1209,7 @@ import { Analytics } from "@vercel/analytics/react";
             {L <= 0 ? "ENTER YOUR TOTAL LEADERSHIP BELOW." : "TOTAL LEADERSHIP"}
           </span>
 
-// Image AIDE LEADERSHIP
+ {/* Image AIDE LEADERSHIP */}
                 
           {/* utilise ta map d’icônes */}
           {TB_ICONS["Leadership"] && (
@@ -1219,7 +1219,7 @@ import { Analytics } from "@vercel/analytics/react";
             />
           )}
             </div>
-// ENTRÉE DONNÉE (ex 125000)
+ {/*ENTRÉE DONNÉE (ex 125000)*/}
               
             <input
               id="ldr-input"
@@ -1242,7 +1242,7 @@ import { Analytics } from "@vercel/analytics/react";
             </div>
             </div>
 
-// SECTION SELECTION GUARDSMEN / SPECIALIST
+ {/* SECTION SELECTION GUARDSMEN / SPECIALIST*/}
           
         {/* S/G */}
         <section className={`${clsPanel} mx-2`}>
@@ -1310,7 +1310,7 @@ import { Analytics } from "@vercel/analytics/react";
           </div>
         </section>
 
-// SECTION SELECTION MONSTRES
+ {/* SECTION SELECTION MONSTRES*/}
             {/* Monsters selection */}
             <section className={`${clsPanel} mx-2`}>
               <h2 className="text-lg mb-3" style={glow}>MONSTERS</h2>
@@ -1377,9 +1377,9 @@ import { Analytics } from "@vercel/analytics/react";
               </div>
             </section>
 
-// SECTION DES RÉSULTATS --------------------------------------------------------------------------------
+ {/*// SECTION DES RÉSULTATS --------------------------------------------------------------------------------*/}
 
-// Résultat Mercenaires et Monstres
+ {/* Résultat Mercenaires et Monstres*/}
           
         <section className={`${clsPanel} mx-2`}>
           <h2 className="text-lg mb-3" style={glow}>MONSTERS & MERCS RESULT</h2>
@@ -1424,7 +1424,7 @@ import { Analytics } from "@vercel/analytics/react";
           </div>
         </section>
 
-// Résultat Guardsmen et Specialist
+ {/* Résultat Guardsmen et Specialist*/}
 
             <section className={`${clsPanel} mx-2`}>
               <h2 className="text-lg mb-3" style={glow}>
@@ -1565,7 +1565,7 @@ import { Analytics } from "@vercel/analytics/react";
               )}
             </section>
 
-// Résultat Calcs et tests log
+ {/*Résultat Calcs et tests log*/}
           
         {/* Calcs & Test Log */}
         <section className={`${clsPanel} mx-2`}>
@@ -1614,7 +1614,7 @@ import { Analytics } from "@vercel/analytics/react";
           </div>
         )}
 
-// SIGNATURE 
+ {/* SIGNATURE*/}
         
       {/* LØKI */}
       <div className="fixed bottom-4 right-4 z-[60] select-none">
@@ -1626,3 +1626,4 @@ import { Analytics } from "@vercel/analytics/react";
 }
 
 // FIN
+

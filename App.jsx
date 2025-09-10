@@ -677,165 +677,242 @@ function HoverImageHelp({ src, alt = "Help" }) {
 }
 
 // -------------------- App --------------------
-export default function TBStackCalculator(){
-  const sfx=useTBSfx();
-  const [ldrInput,setLdrInput]=useState(""); const L=useMemo(()=>parseNumber(ldrInput),[ldrInput]);
-  const [selected,setSelected]=useState(Object.fromEntries([...GUARDSMEN,...SPECIALISTS].map(k=>[k,false])));
-  const [typePicks,setTypePicks]=useState({});
-  const [userIcons,setUserIcons]=useState(()=>{ try{return JSON.parse(localStorage.getItem('tb_user_icons_v1')||'{}')}catch{return {}} });
-  const setIcon=(key,dataUrl)=>{ const next={...userIcons,[key]:dataUrl}; setUserIcons(next); try{ localStorage.setItem('tb_user_icons_v1', JSON.stringify(next)); }catch{} };
- const iconFor = (level, type) => {
-  // 1) Essayer dans TB_ICONS avec une clé standard (g8m, s7f, etc.)
-  try {
-    const key = sgTBIconKey(level, type);
-    if (key && TB_ICONS[key]) return TB_ICONS[key];
-  } catch {}
+export default function TBStackCalculator() {
+  const sfx = useTBSfx();
 
-  // 2) Sinon, retomber sur l'icône utilisateur (localStorage) si présente
-  return userIcons[`${level}|${type}`] || null;
-};
-  const [showIcons,setShowIcons]=useState(false);
-  const toggleType=(tier,type)=> setTypePicks(p=>{ const cur=new Set(p[tier]||[]); cur.has(type)?(cur.delete(type),sfx.deselect()):(cur.add(type),sfx.select()); return {...p,[tier]:cur}; });
-  const picksSigSG=useMemo(()=>Object.entries(typePicks).map(([k,s])=>k+":"+Array.from(s).sort().join('.')).sort().join('|'),[typePicks]);
-  const sg=useMemo(()=>computeSG(L,selected,typePicks),[L,selected,picksSigSG]);
-  const sgRowsSorted=useMemo(()=>[...sg.rows].sort((a,b)=> b.unitStrength-a.unitStrength || b.totalStrength-a.totalStrength || String(b.level).localeCompare(String(a.level)) || String(b.type).localeCompare(String(a.type))),[sg.rows]);
-  const sgBuild=useMemo(()=>{
-    const make=(prefix)=>{
-      const rows=sg.rows.filter(r=> String(r.level).startsWith(prefix) && r.troops>0);
-      if(!rows.length) return {levels:[], byLevel:{}};
-      const orderArr = prefix==='G'? GUARDSMEN : SPECIALISTS;
-      const byLevel = {};
-      rows.forEach(r=>{ (byLevel[r.level] ||= []).push(r); });
-      const present = orderArr.filter(lvl => (byLevel[lvl]?.length));
-      const top = present[present.length-1];
-      const rest = present.filter(l=>l!==top).sort((a,b)=> orderArr.indexOf(a)-orderArr.indexOf(b));
-      const levels = [top, ...rest];
-      levels.forEach(lvl => byLevel[lvl].sort((a,b)=> a.unitStrength - b.unitStrength || a.type.localeCompare(b.type)));
-      return {levels, byLevel};
-    };
-    return { G: make('G'), S: make('S') };
-  }, [sg.rows]);
-  const [monsterFull,setMonsterFull]=useState(Object.fromEntries(MON_GROUPS.map(k=>[k,false])));
-  const fullSelectedOrdered=ORDER_MONSTERS.filter(g=>monsterFull[g]);
-  const partialGroup=nextLowerGroupOf(fullSelectedOrdered);
-  const [entryPicks,setEntryPicks]=useState({});
-  const toggleEntry=(group,idx)=> setEntryPicks(p=>{ const cur=new Set(p[group]||[]); cur.has(idx)?(cur.delete(idx),sfx.deselect()):(cur.add(idx),sfx.select()); return {...p,[group]:cur}; });
-  const picksSignature=useMemo(()=>Object.entries(entryPicks).map(([g,s])=>g+":"+Array.from(s).sort().join('.')).sort().join('|'),[entryPicks]);
-  const anchors=useMemo(()=>computeAnchors(L,sg.SR),[L,sg.SR]);
-  const hasLeadership=L>0;
-  const [bubble,setBubble]=useState(null); const [toast,setToast]=useState(null);
-  useEffect(()=>{ if(!bubble) return; const t=setTimeout(()=>setBubble(null),1800); return ()=>clearTimeout(t); },[bubble]);
-const blocked = (ev) => {
-  if (hasLeadership) return;
+  // -------- State de base
+  const [ldrInput, setLdrInput] = useState("");
+  const L = useMemo(() => parseNumber(ldrInput), [ldrInput]);
 
-  const r = ev.currentTarget.getBoundingClientRect();
-  const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-  const M = 16; // marge de sécurité des bords
+  const [selected, setSelected] = useState(
+    Object.fromEntries([...GUARDSMEN, ...SPECIALISTS].map(k => [k, false]))
+  );
+  const [typePicks, setTypePicks] = useState({});
 
-  // Centre horizontal + clamp dans l’écran
-  let x = r.left + r.width / 2;
-  x = Math.min(Math.max(x, M), vw - M);
-
-  // On préfère au-dessus ; si trop près du haut, on bascule en dessous
-  const flip = r.top < 64; // seuil (px)
-  const y = flip ? (r.bottom + 12) : r.top;
-
-  setBubble({
-    x,
-    y,
-    pos: flip ? 'bottom' : 'top',
-    text: 'Enter a value for TOTAL LEADERSHIP first'
+  // -------- Icônes (lib par défaut + custom user)
+  const [userIcons, setUserIcons] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("tb_user_icons_v1") || "{}"); }
+    catch { return {}; }
   });
-  sfx.deselect();
-};
-
-const monstersRows=useMemo(()=>{ 
-  if(!anchors.Imerc) return []; 
-  const out=[]; 
-  const apply=(group,I)=>{ 
-    if(!group) return; 
-    const picks=entryPicks[group]; 
-    const idxs=picks?.size? Array.from(picks): MONSTERS[group].map((_,i)=>i); 
-    idxs.forEach(i=>{ 
-      const u=MONSTERS[group][i]; 
-      const n=Math.floor((I||0)/u.health); 
-      out.push({
-        group,
-        type:u.type,
-        name:u.name,
-        count:n,
-        totalHealth:n*u.health,
-        unitStrength:u.strength,
-        unitHealth:u.health,
-        totalStrength:n*u.strength
-      }); 
-    }); 
+  const setIcon = (key, dataUrl) => {
+    const next = { ...userIcons, [key]: dataUrl };
+    setUserIcons(next);
+    try { localStorage.setItem("tb_user_icons_v1", JSON.stringify(next)); } catch {}
   };
-  fullSelectedOrdered.forEach((g,i)=> apply(g, anchors.Imerc * CONSTS.s ** (1+i)) );
-  return out; 
-},[anchors,fullSelectedOrdered.join(','),picksSignature,entryPicks]);
+  const iconFor = (level, type) => {
+    try {
+      const key = sgTBIconKey(level, type);
+      if (key && TB_ICONS[key]) return TB_ICONS[key];
+    } catch {}
+    return userIcons[`${level}|${type}`] || null;
+  };
+  const [showIcons, setShowIcons] = useState(false);
 
-// 🔽 AJOUT : tri décroissant par santé (HP unitaire), puis HP total, puis nom
-const monstersRowsSorted = useMemo(
-  () => [...monstersRows].sort(
-    (a,b) =>
-      b.unitHealth - a.unitHealth ||     // 1) HP unitaire décroissant
-      b.totalHealth - a.totalHealth ||   // 2) puis HP total décroissant
-      a.name.localeCompare(b.name)       // 3) puis nom (stabilité)
-  ),
-  [monstersRows]
-);
-  const mercRows=useMemo(()=> !anchors.Imerc? []: MERCS.map(u=>{ const cannon=u.type==="merc-cannon"||u.type==="merc-hunter"; const I=cannon? anchors.Icannon: anchors.Imerc; const n=Math.floor(I/u.health); return {...u,count:n,totalHealth:n*u.health,totalStrength:n*u.strength}; }),[anchors]);
-  const hasMercResults=useMemo(()=> mercRows.some(r=>r.count>0),[mercRows]);
-  const mercRowsNZ=useMemo(()=> mercRows.filter(r=>r.count>0),[mercRows]);
-  const srTerms=useMemo(()=> ORDER.filter(k=>selected[k]).flatMap(level=>{ const rows=DATA[level]; const picks=typePicks[level]; const flt=picks?.size? rows.filter(u=>picks.has(u.type)):rows; return flt.map(u=>({level,...u,term:u.ldr/u.health})); }),[selected,picksSigSG]);
-  const sgTotals=useMemo(()=>({ troops: sg.rows.reduce((a,r)=>a+r.troops,0), hp: sg.rows.reduce((a,r)=>a+r.totalHealth,0), str: sg.rows.reduce((a,r)=>a+r.totalStrength,0) }),[sg.rows]);
-  const monstersTotals=useMemo(()=>({ count: monstersRows.reduce((a,r)=>a+r.count,0), hp: monstersRows.reduce((a,r)=>a+r.totalHealth,0), str: monstersRows.reduce((a,r)=>a+r.totalStrength,0) }),[monstersRows]);
-  const mercTotals=useMemo(()=>({ count: mercRowsNZ.reduce((a,r)=>a+r.count,0), hp: mercRowsNZ.reduce((a,r)=>a+r.totalHealth,0), str: mercRowsNZ.reduce((a,r)=>a+r.totalStrength,0) }),[mercRowsNZ]);
-  const [showTypePicks,setShowTypePicks]=useState(false);
-  const [showEntryPicks,setShowEntryPicks]=useState(false);
-  const [showSGBuild,setShowSGBuild]=useState(false);
-  const [showUnitImages,setShowUnitImages]=useState(true);
-  const [showCalcs,setShowCalcs]=useState(false);
-// ---- Contact modal (email) ----
-const [contactOpen, setContactOpen] = useState(false);
-const [contact, setContact] = useState({ from: "", subject: "", message: "" });
+  // -------- Sélections S/G
+  const toggleType = (tier, type) =>
+    setTypePicks(p => {
+      const cur = new Set(p[tier] || []);
+      cur.has(type) ? (cur.delete(type), sfx.deselect()) : (cur.add(type), sfx.select());
+      return { ...p, [tier]: cur };
+    });
+  const picksSigSG = useMemo(
+    () =>
+      Object.entries(typePicks)
+        .map(([k, s]) => k + ":" + Array.from(s).sort().join("."))
+        .sort()
+        .join("|"),
+    [typePicks]
+  );
 
-// ⚠️ Put your receiving address here
-const RECEIVER_EMAIL = "your.address@email";
+  const sg = useMemo(() => computeSG(L, selected, typePicks), [L, selected, picksSigSG]);
+  const sgRowsSorted = useMemo(
+    () =>
+      [...sg.rows].sort(
+        (a, b) =>
+          b.unitStrength - a.unitStrength ||
+          b.totalStrength - a.totalStrength ||
+          String(b.level).localeCompare(String(a.level)) ||
+          String(b.type).localeCompare(String(a.type))
+      ),
+    [sg.rows]
+  );
 
-const openContact = () => { sfx.select(); setContactOpen(true); };
-const closeContact = () => { sfx.deselect(); setContactOpen(false); };
+  const sgBuild = useMemo(() => {
+    const make = (prefix) => {
+      const rows = sg.rows.filter(r => String(r.level).startsWith(prefix) && r.troops > 0);
+      if (!rows.length) return { levels: [], byLevel: {} };
+      const orderArr = prefix === "G" ? GUARDSMEN : SPECIALISTS;
+      const byLevel = {};
+      rows.forEach(r => { (byLevel[r.level] ||= []).push(r); });
+      const present = orderArr.filter(lvl => byLevel[lvl]?.length);
+      const top = present[present.length - 1];
+      const rest = present.filter(l => l !== top).sort((a, b) => orderArr.indexOf(a) - orderArr.indexOf(b));
+      const levels = [top, ...rest];
+      levels.forEach(lvl =>
+        byLevel[lvl].sort((a, b) => a.unitStrength - b.unitStrength || a.type.localeCompare(b.type))
+      );
+      return { levels, byLevel };
+    };
+    return { G: make("G"), S: make("S") };
+  }, [sg.rows]);
 
-const handleSend = (e) => {
-  e.preventDefault();
-  const body = `${contact.message}\n\n---\nFrom: ${contact.from || "(no email)"}`;
-  const mailto =
-    `mailto:${RECEIVER_EMAIL}` +
-    `?subject=${encodeURIComponent(contact.subject)}` +
-    `&body=${encodeURIComponent(body)}`;
-  window.location.href = mailto;
-  sfx.select();
-  setContactOpen(false);
-};
-// Afficher ou non les images dans les résultats S/G
-const [showUnitImages, setShowUnitImages] = useState(() => {
-  try { return JSON.parse(localStorage.getItem('tb_show_unit_images_v1') ?? 'true'); }
-  catch { return true; }
-});
-useEffect(() => {
-  try { localStorage.setItem('tb_show_unit_images_v1', JSON.stringify(showUnitImages)); } catch {}
-}, [showUnitImages]);
+  // -------- Monstres
+  const [monsterFull, setMonsterFull] = useState(
+    Object.fromEntries(MON_GROUPS.map(k => [k, false]))
+  );
+  const fullSelectedOrdered = ORDER_MONSTERS.filter(g => monsterFull[g]);
+  const partialGroup = nextLowerGroupOf(fullSelectedOrdered); // ok si pas utilisé
 
-    
+  const [entryPicks, setEntryPicks] = useState({});
+  const toggleEntry = (group, idx) =>
+    setEntryPicks(p => {
+      const cur = new Set(p[group] || []);
+      cur.has(idx) ? (cur.delete(idx), sfx.deselect()) : (cur.add(idx), sfx.select());
+      return { ...p, [group]: cur };
+    });
+  const picksSignature = useMemo(
+    () =>
+      Object.entries(entryPicks)
+        .map(([g, s]) => g + ":" + Array.from(s).sort().join("."))
+        .sort()
+        .join("|"),
+    [entryPicks]
+  );
 
-// Close on Escape (optional)
-useEffect(() => {
-  if (!contactOpen) return;
-  const onKey = (e) => e.key === "Escape" && closeContact();
-  window.addEventListener("keydown", onKey);
-  return () => window.removeEventListener("keydown", onKey);
-}, [contactOpen]);
+  const anchors = useMemo(() => computeAnchors(L, sg.SR), [L, sg.SR]);
+  const hasLeadership = L > 0;
+
+  const [bubble, setBubble] = useState(null);
+  const [toast, setToast] = useState(null);
+  useEffect(() => {
+    if (!bubble) return;
+    const t = setTimeout(() => setBubble(null), 1800);
+    return () => clearTimeout(t);
+  }, [bubble]);
+
+  const blocked = (ev) => {
+    if (hasLeadership) return;
+    const r = ev.currentTarget.getBoundingClientRect();
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const M = 16;
+    let x = r.left + r.width / 2;
+    x = Math.min(Math.max(x, M), vw - M);
+    const flip = r.top < 64;
+    const y = flip ? (r.bottom + 12) : r.top;
+    setBubble({ x, y, pos: flip ? "bottom" : "top", text: "Enter a value for TOTAL LEADERSHIP first" });
+    sfx.deselect();
+  };
+
+  const monstersRows = useMemo(() => {
+    if (!anchors.Imerc) return [];
+    const out = [];
+    const apply = (group, I) => {
+      if (!group) return;
+      const picks = entryPicks[group];
+      const idxs = picks?.size ? Array.from(picks) : MONSTERS[group].map((_, i) => i);
+      idxs.forEach(i => {
+        const u = MONSTERS[group][i];
+        const n = Math.floor((I || 0) / u.health);
+        out.push({
+          group,
+          type: u.type,
+          name: u.name,
+          count: n,
+          totalHealth: n * u.health,
+          unitStrength: u.strength,
+          unitHealth: u.health,
+          totalStrength: n * u.strength
+        });
+      });
+    };
+    fullSelectedOrdered.forEach((g, i) => apply(g, anchors.Imerc * CONSTS.s ** (1 + i)));
+    return out;
+  }, [anchors, fullSelectedOrdered.join(","), picksSignature, entryPicks]);
+
+  const monstersRowsSorted = useMemo(
+    () =>
+      [...monstersRows].sort(
+        (a, b) =>
+          b.unitHealth - a.unitHealth ||
+          b.totalHealth - a.totalHealth ||
+          a.name.localeCompare(b.name)
+      ),
+    [monstersRows]
+  );
+
+  // -------- Mercenaires
+  const mercRows = useMemo(
+    () =>
+      !anchors.Imerc
+        ? []
+        : MERCS.map(u => {
+            const cannon = u.type === "merc-cannon" || u.type === "merc-hunter";
+            const I = cannon ? anchors.Icannon : anchors.Imerc;
+            const n = Math.floor(I / u.health);
+            return { ...u, count: n, totalHealth: n * u.health, totalStrength: n * u.strength };
+          }),
+    [anchors]
+  );
+  const hasMercResults = useMemo(() => mercRows.some(r => r.count > 0), [mercRows]);
+  const mercRowsNZ = useMemo(() => mercRows.filter(r => r.count > 0), [mercRows]);
+
+  // -------- Totaux / SR breakdown
+  const srTerms = useMemo(
+    () =>
+      ORDER.filter(k => selected[k]).flatMap(level => {
+        const rows = DATA[level];
+        const picks = typePicks[level];
+        const flt = picks?.size ? rows.filter(u => picks.has(u.type)) : rows;
+        return flt.map(u => ({ level, ...u, term: u.ldr / u.health }));
+      }),
+    [selected, picksSigSG]
+  );
+  const sgTotals = useMemo(
+    () => ({
+      troops: sg.rows.reduce((a, r) => a + r.troops, 0),
+      hp: sg.rows.reduce((a, r) => a + r.totalHealth, 0),
+      str: sg.rows.reduce((a, r) => a + r.totalStrength, 0)
+    }),
+    [sg.rows]
+  );
+  const monstersTotals = useMemo(
+    () => ({
+      count: monstersRows.reduce((a, r) => a + r.count, 0),
+      hp: monstersRows.reduce((a, r) => a + r.totalHealth, 0),
+      str: monstersRows.reduce((a, r) => a + r.totalStrength, 0)
+    }),
+    [monstersRows]
+  );
+  const mercTotals = useMemo(
+    () => ({
+      count: mercRowsNZ.reduce((a, r) => a + r.count, 0),
+      hp: mercRowsNZ.reduce((a, r) => a + r.totalHealth, 0),
+      str: mercRowsNZ.reduce((a, r) => a + r.totalStrength, 0)
+    }),
+    [mercRowsNZ]
+  );
+
+  // -------- Switchs d’UI
+  const [showTypePicks, setShowTypePicks] = useState(false);
+  const [showEntryPicks, setShowEntryPicks] = useState(false);
+  const [showSGBuild, setShowSGBuild] = useState(false);
+
+  // ✅ Afficher ou non les images dans les résultats S/G (persisté)
+  const [showUnitImages, setShowUnitImages] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("tb_show_unit_images_v1") ?? "true"); }
+    catch { return true; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("tb_show_unit_images_v1", JSON.stringify(showUnitImages)); } catch {}
+  }, [showUnitImages]);
+
+  const [showCalcs, setShowCalcs] = useState(false);
+
+
+
+ 
+}
+
 
 
   // -------------------- Tests rapides (ne modifient rien à l'UI) --------------------
@@ -1572,6 +1649,7 @@ useEffect(() => {
     </div> 
   );
 }
+
 
 
 

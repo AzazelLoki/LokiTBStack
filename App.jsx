@@ -1382,7 +1382,7 @@ export default function TBStackCalculator(){
       <div>
         <h3 className="font-semibold mb-3" style={glow}>Mercs</h3>
         <SimpleTable
-          large
+          className="tb-media"        // ← ajoute cette classe pour la même grosseur
           left
           headers={["Type", "Count"]}
           rows={mercRowsNZ.map(m => [m.type, m.count])}
@@ -1415,6 +1415,7 @@ export default function TBStackCalculator(){
     </div>
   </div>
 </section>
+
 
 
 {/* S/G Results */}
@@ -1676,6 +1677,7 @@ export default function TBStackCalculator(){
     </div> 
   );
 }
+
 
 
 

@@ -1118,8 +1118,8 @@ export default function TBStackCalculator(){
 .tb-media th:last-child,
 .tb-media td:last-child {
   /* Count un poil plus gros */
-  font-size: clamp(1.5rem, 2.8vw, 2.4rem) !important;
-  font-weight: 800;
+  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
+  font-weight: 700;
 }
 
 /* Présentation de la cellule "Unit" (image centrée) */
@@ -1137,7 +1137,7 @@ export default function TBStackCalculator(){
 
 /* En-têtes un peu plus gros */
 .tb-media thead th {
-  font-size: clamp(1.4rem, 2.6vw, 2.2rem) !important;
+  font-size: clamp(1.25rem, 2.2vw, 2rem) !important;
 }
 `}</style>
 
@@ -1676,6 +1676,7 @@ export default function TBStackCalculator(){
     </div> 
   );
 }
+
 
 
 

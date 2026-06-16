@@ -183,75 +183,79 @@ const computeAdvancedSG = (leadership, selected, typePicks) => {
     return { rows: [], used: 0, leftover: leadership, T: 0, SR: 0, advancedOrder: [] };
   }
 
-// -------------------- Advanced Stack Ordering --------------------
-// Même ordre logique que Balanced HP
-const ordered = [...chosen].sort((a, b) => {
-  const aIsSpec = String(a.level).startsWith("S") ? 0 : 1;
-  const bIsSpec = String(b.level).startsWith("S") ? 0 : 1;
+  const ordered = [...chosen].sort((a, b) => {
+    const aIsSpec = String(a.level).startsWith("S") ? 0 : 1;
+    const bIsSpec = String(b.level).startsWith("S") ? 0 : 1;
+    if (aIsSpec !== bIsSpec) return aIsSpec - bIsSpec;
 
-  if (aIsSpec !== bIsSpec) return aIsSpec - bIsSpec;
+    const levelCompare = String(a.level).localeCompare(String(b.level), undefined, { numeric: true });
+    if (levelCompare !== 0) return levelCompare;
 
-  const levelCompare = String(a.level).localeCompare(String(b.level), undefined, { numeric: true });
-  if (levelCompare !== 0) return levelCompare;
+    if (a.ratio !== b.ratio) return a.ratio - b.ratio;
+    if (a.effectiveStrength !== b.effectiveStrength) return a.effectiveStrength - b.effectiveStrength;
+    if (a.unitStrength !== b.unitStrength) return a.unitStrength - b.unitStrength;
 
-  if (a.ratio !== b.ratio) return a.ratio - b.ratio;
-  if (a.effectiveStrength !== b.effectiveStrength) return a.effectiveStrength - b.effectiveStrength;
-  if (a.unitStrength !== b.unitStrength) return a.unitStrength - b.unitStrength;
-
-  return String(a.type).localeCompare(String(b.type));
-});
+    return String(a.type).localeCompare(String(b.type));
+  });
 
   const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);
   const baseT = Math.floor(leadership / SR);
 
-// Allocation approximative:
-// les premières unités dans ordered reçoivent une cible plus haute.
-const hedge = 1;
+  const hedge = 0.9995;
 
-const rows = ordered.map((u, i) => {
-  const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, i)));
-  const troops = Math.floor(target / u.health);
-  const ldrUsed = troops * u.ldr;
+  const rows = ordered.map((u, i) => {
+    const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, i)));
+    const troops = Math.floor(target / u.health);
+    const ldrUsed = troops * u.ldr;
 
-  return {
-    level: u.level,
-    type: u.type,
-    troops,
-    totalHealth: troops * u.health,
-    ldrUsed,
-    unitStrength: u.unitStrength,
-    totalStrength: troops * u.unitStrength,
-    ratio: u.ratio,
-    effectiveStrength: u.effectiveStrength,
-    stackHealthTarget: target,
-    mode: "advanced",
-  };
-});
+    return {
+      level: u.level,
+      type: u.type,
+      troops,
+      totalHealth: troops * u.health,
+      ldrUsed,
+      unitStrength: u.unitStrength,
+      totalStrength: troops * u.unitStrength,
+      ratio: u.ratio,
+      effectiveStrength: u.effectiveStrength,
+      stackHealthTarget: target,
+      mode: "advanced",
+    };
+  });
 
   let used = rows.reduce((a, r) => a + r.ldrUsed, 0);
+  let leftover = leadership - used;
 
-  // Si on dépasse le leadership, on réduit d'abord les stacks les moins efficaces.
-  if (used > leadership) {
-    const trimOrder = [...rows.keys()].sort((ia, ib) =>
-      (rows[ia].effectiveStrength || 0) - (rows[ib].effectiveStrength || 0)
+  // Redistribue le leadership restant au lieu de le gaspiller comme un comité de budget.
+  const fillOrder = [...rows.keys()].sort((ia, ib) => {
+    return (
+      (rows[ib].effectiveStrength || 0) - (rows[ia].effectiveStrength || 0) ||
+      (rows[ib].unitStrength || 0) - (rows[ia].unitStrength || 0)
     );
+  });
 
-    let cursor = 0;
-    while (used > leadership && cursor < trimOrder.length) {
-      const idx = trimOrder[cursor];
+  let safety = 0;
+  while (leftover > 0 && safety < 100000) {
+    let added = false;
+
+    for (const idx of fillOrder) {
       const r = rows[idx];
       const def = DATA[r.level]?.find(u => u.type === r.type);
 
-      if (r.troops > 0 && def) {
-        r.troops -= 1;
-        r.totalHealth -= def.health;
-        r.totalStrength -= r.unitStrength;
-        r.ldrUsed -= def.ldr;
-        used = rows.reduce((a, rr) => a + rr.ldrUsed, 0);
-      } else {
-        cursor++;
+      if (!def) continue;
+
+      if (leftover >= def.ldr) {
+        r.troops += 1;
+        r.totalHealth += def.health;
+        r.totalStrength += r.unitStrength;
+        r.ldrUsed += def.ldr;
+        leftover -= def.ldr;
+        added = true;
       }
     }
+
+    if (!added) break;
+    safety++;
   }
 
   used = rows.reduce((a, r) => a + r.ldrUsed, 0);
@@ -265,7 +269,6 @@ const rows = ordered.map((u, i) => {
     advancedOrder: ordered,
   };
 };
-
 
 // MONSTRES (group|type|strength|health|name)
     const MON_CSV = [

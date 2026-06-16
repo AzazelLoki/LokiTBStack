@@ -1462,9 +1462,7 @@ body,
       Advanced Optimizer (experimental)
     </button>
   </div>
-  <p className="text-xs mt-3 opacity-80">
-    Advanced mode is an approximation based on stack ordering, strength/health ratio and reverse allocation. It is not a perfect clone of TotalCalculator.
-  </p>
+
 </section>
 
 {/* S/G */}

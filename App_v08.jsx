@@ -226,30 +226,29 @@ const ordered = [...chosen].sort((a, b) => {
   const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);
   const baseT = Math.floor(leadership / SR);
 
-  // Reverse allocation approximative:
-  // les stacks jugés plus "valuable" ont une cible légèrement plus haute.
-  const hedge = 0.985;
+// Allocation approximative:
+// les premières unités dans ordered reçoivent une cible plus haute.
+const hedge = 0.995;
 
-  const rows = ordered.map((u, i) => {
-    const reverseIndex = ordered.length - 1 - i;
-    const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, reverseIndex)));
-    const troops = Math.floor(target / u.health);
-    const ldrUsed = troops * u.ldr;
+const rows = ordered.map((u, i) => {
+  const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, i)));
+  const troops = Math.floor(target / u.health);
+  const ldrUsed = troops * u.ldr;
 
-    return {
-      level: u.level,
-      type: u.type,
-      troops,
-      totalHealth: troops * u.health,
-      ldrUsed,
-      unitStrength: u.unitStrength,
-      totalStrength: troops * u.unitStrength,
-      ratio: u.ratio,
-      effectiveStrength: u.effectiveStrength,
-      stackHealthTarget: target,
-      mode: "advanced",
-    };
-  });
+  return {
+    level: u.level,
+    type: u.type,
+    troops,
+    totalHealth: troops * u.health,
+    ldrUsed,
+    unitStrength: u.unitStrength,
+    totalStrength: troops * u.unitStrength,
+    ratio: u.ratio,
+    effectiveStrength: u.effectiveStrength,
+    stackHealthTarget: target,
+    mode: "advanced",
+  };
+});
 
   let used = rows.reduce((a, r) => a + r.ldrUsed, 0);
 
@@ -875,13 +874,14 @@ export default function TBStackCalculator(){
     [typePicks]
   );
 
-  // 5) Computations
-  const sg = useMemo(
-    () => calcMode === "advanced"
-      ? computeAdvancedSG(L, selected, typePicks)
-      : computeSG(L, selected, typePicks),
-    [L, selected, picksSigSG, calcMode]
-  );
+// 5) Computations
+const sg = useMemo(
+  () => calcMode === "advanced"
+    ? computeAdvancedSG(L, selected, typePicks)
+    : computeSG(L, selected, typePicks),
+  [L, selected, picksSigSG, calcMode]
+);
+
 const sgRowsSorted = useMemo(
   () =>
     [...sg.rows].sort(
@@ -893,18 +893,8 @@ const sgRowsSorted = useMemo(
     ),
   [sg.rows]
 );
-      }
 
-      // Mode Balanced: ancien affichage
-      return (
-        (b.unitStrength || 0) - (a.unitStrength || 0) ||
-        (b.totalStrength || 0) - (a.totalStrength || 0) ||
-        String(a.level).localeCompare(String(b.level)) ||
-        String(a.type).localeCompare(String(b.type))
-      );
-    }),
-  [sg.rows, calcMode]
-);
+
 
   const sgBuild = useMemo(() => {
     const make = (prefix) => {

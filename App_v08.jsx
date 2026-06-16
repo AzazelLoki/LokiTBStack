@@ -224,41 +224,43 @@ const rows = ordered.map((u, i) => {
 });
 
 let used = rows.reduce((a, r) => a + r.ldrUsed, 0);
+let leftover = leadership - used;
 
-// Remplit le leadership restant sans jamais dépasser
+// Remplit sans jamais dépasser
 const fillOrder = [...rows.keys()].sort((ia, ib) =>
   (rows[ib].effectiveStrength || 0) - (rows[ia].effectiveStrength || 0) ||
   (rows[ib].unitStrength || 0) - (rows[ia].unitStrength || 0)
 );
 
+let added = true;
 let safety = 0;
-while (safety < 100000) {
-  let added = false;
+
+while (added && safety < 100000) {
+  added = false;
 
   for (const idx of fillOrder) {
     const r = rows[idx];
-    const def = DATA[r.level]?.find(u => u.type === r.type);
-    if (!def) continue;
 
-    const currentUsed = rows.reduce((a, rr) => a + rr.ldrUsed, 0);
-    const currentLeftover = leadership - currentUsed;
+    if (leftover >= r.ldrUsed / Math.max(r.troops, 1) || leftover >= r.ldrUsed && r.troops === 0) {
+      const unitLdr = r.troops > 0 ? r.ldrUsed / r.troops : 1;
 
-    if (currentLeftover >= def.ldr) {
-      r.troops += 1;
-      r.totalHealth += def.health;
-      r.totalStrength += r.unitStrength;
-      r.ldrUsed += def.ldr;
-      added = true;
+      if (leftover >= unitLdr) {
+        r.troops += 1;
+        r.totalHealth += r.totalHealth / Math.max(r.troops - 1, 1);
+        r.totalStrength += r.unitStrength;
+        r.ldrUsed += unitLdr;
+
+        used += unitLdr;
+        leftover = leadership - used;
+        added = true;
+      }
     }
   }
 
-  if (!added) break;
   safety++;
 }
 
-used = rows.reduce((a, r) => a + r.ldrUsed, 0);
-
-// Sécurité finale anti-dépassement, parce que le code aussi a besoin d’un garde-fou
+// Sécurité finale absolue
 while (used > leadership) {
   const idx = rows
     .map((r, i) => ({ ...r, i }))
@@ -271,16 +273,19 @@ while (used > leadership) {
   if (idx === undefined) break;
 
   const r = rows[idx];
-  const def = DATA[r.level]?.find(u => u.type === r.type);
-  if (!def) break;
+  const unitLdr = r.ldrUsed / r.troops;
+  const unitHealth = r.totalHealth / r.troops;
 
   r.troops -= 1;
-  r.totalHealth -= def.health;
+  r.totalHealth -= unitHealth;
   r.totalStrength -= r.unitStrength;
-  r.ldrUsed -= def.ldr;
+  r.ldrUsed -= unitLdr;
 
   used = rows.reduce((a, rr) => a + rr.ldrUsed, 0);
+  leftover = leadership - used;
 }
+
+used = rows.reduce((a, r) => a + r.ldrUsed, 0);
 
 return {
   rows,

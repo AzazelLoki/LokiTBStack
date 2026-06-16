@@ -198,78 +198,98 @@ const computeAdvancedSG = (leadership, selected, typePicks) => {
     return String(a.type).localeCompare(String(b.type));
   });
 
-  const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);
-  const baseT = Math.floor(leadership / SR);
+const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);
+const baseT = Math.floor(leadership / SR);
 
-  const hedge = 0.9995;
+const hedge = 0.9995;
 
-  const rows = ordered.map((u, i) => {
-    const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, i)));
-    const troops = Math.floor(target / u.health);
-    const ldrUsed = troops * u.ldr;
-
-    return {
-      level: u.level,
-      type: u.type,
-      troops,
-      totalHealth: troops * u.health,
-      ldrUsed,
-      unitStrength: u.unitStrength,
-      totalStrength: troops * u.unitStrength,
-      ratio: u.ratio,
-      effectiveStrength: u.effectiveStrength,
-      stackHealthTarget: target,
-      mode: "advanced",
-    };
-  });
-
-  let used = rows.reduce((a, r) => a + r.ldrUsed, 0);
-  let leftover = leadership - used;
-
-  // Redistribue le leadership restant au lieu de le gaspiller comme un comité de budget.
-  const fillOrder = [...rows.keys()].sort((ia, ib) => {
-    return (
-      (rows[ib].effectiveStrength || 0) - (rows[ia].effectiveStrength || 0) ||
-      (rows[ib].unitStrength || 0) - (rows[ia].unitStrength || 0)
-    );
-  });
-
-  let safety = 0;
-  while (leftover > 0 && safety < 100000) {
-    let added = false;
-
-    for (const idx of fillOrder) {
-      const r = rows[idx];
-      const def = DATA[r.level]?.find(u => u.type === r.type);
-
-      if (!def) continue;
-
-      if (leftover >= def.ldr) {
-        r.troops += 1;
-        r.totalHealth += def.health;
-        r.totalStrength += r.unitStrength;
-        r.ldrUsed += def.ldr;
-        leftover -= def.ldr;
-        added = true;
-      }
-    }
-
-    if (!added) break;
-    safety++;
-  }
-
-  used = rows.reduce((a, r) => a + r.ldrUsed, 0);
+const rows = ordered.map((u, i) => {
+  const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, i)));
+  const troops = Math.floor(target / u.health);
+  const ldrUsed = troops * u.ldr;
 
   return {
-    rows,
-    used,
-    leftover: leadership - used,
-    T: baseT,
-    SR,
-    advancedOrder: ordered,
+    level: u.level,
+    type: u.type,
+    troops,
+    totalHealth: troops * u.health,
+    ldrUsed,
+    unitStrength: u.unitStrength,
+    totalStrength: troops * u.unitStrength,
+    ratio: u.ratio,
+    effectiveStrength: u.effectiveStrength,
+    stackHealthTarget: target,
+    mode: "advanced",
   };
-};
+});
 
+let used = rows.reduce((a, r) => a + r.ldrUsed, 0);
+
+// Remplit le leadership restant sans jamais dépasser
+const fillOrder = [...rows.keys()].sort((ia, ib) =>
+  (rows[ib].effectiveStrength || 0) - (rows[ia].effectiveStrength || 0) ||
+  (rows[ib].unitStrength || 0) - (rows[ia].unitStrength || 0)
+);
+
+let safety = 0;
+while (safety < 100000) {
+  let added = false;
+
+  for (const idx of fillOrder) {
+    const r = rows[idx];
+    const def = DATA[r.level]?.find(u => u.type === r.type);
+    if (!def) continue;
+
+    const currentUsed = rows.reduce((a, rr) => a + rr.ldrUsed, 0);
+    const currentLeftover = leadership - currentUsed;
+
+    if (currentLeftover >= def.ldr) {
+      r.troops += 1;
+      r.totalHealth += def.health;
+      r.totalStrength += r.unitStrength;
+      r.ldrUsed += def.ldr;
+      added = true;
+    }
+  }
+
+  if (!added) break;
+  safety++;
+}
+
+used = rows.reduce((a, r) => a + r.ldrUsed, 0);
+
+// Sécurité finale anti-dépassement, parce que le code aussi a besoin d’un garde-fou
+while (used > leadership) {
+  const idx = rows
+    .map((r, i) => ({ ...r, i }))
+    .filter(r => r.troops > 0)
+    .sort((a, b) =>
+      (a.effectiveStrength || 0) - (b.effectiveStrength || 0) ||
+      (a.unitStrength || 0) - (b.unitStrength || 0)
+    )[0]?.i;
+
+  if (idx === undefined) break;
+
+  const r = rows[idx];
+  const def = DATA[r.level]?.find(u => u.type === r.type);
+  if (!def) break;
+
+  r.troops -= 1;
+  r.totalHealth -= def.health;
+  r.totalStrength -= r.unitStrength;
+  r.ldrUsed -= def.ldr;
+
+  used = rows.reduce((a, rr) => a + rr.ldrUsed, 0);
+}
+
+return {
+  rows,
+  used,
+  leftover: leadership - used,
+  T: baseT,
+  SR,
+  advancedOrder: ordered,
+};
 // MONSTRES (group|type|strength|health|name)
     const MON_CSV = [
       "M3|ranged|1800|5700|Water Elemental",

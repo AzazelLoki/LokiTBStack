@@ -1064,16 +1064,64 @@ export default function TBStackCalculator(){
 
 
 
-  // -------------------- Tests rapides (ne modifient rien à l'UI) --------------------
-  useEffect(()=>{
-    const A=computeAnchors(100,.5); console.assert(Math.abs(A.BASE-197.6)<.3,'BASE math');
-    const p=parseNumber('12\u00A0500'); console.assert(p===12500,'NBSP parse');
-    const sgTest=computeSG(50000,{G5:true},{}) ; console.assert(sgTest && typeof sgTest.SR==='number','computeSG returns');
-  },[]);
-  const reset=()=>{ setLdrInput(""); setCalcMode("balanced"); setSelected(Object.fromEntries([...GUARDSMEN,...SPECIALISTS].map(k=>[k,false]))); setTypePicks({}); setMonsterFull(Object.fromEntries(MON_GROUPS.map(k=>[k,false]))); setEntryPicks({}); setShowTypePicks(false); setShowEntryPicks(false); setShowCalcs(false); setBubble(null); sfx.deselect(); setToast('Reset done'); setTimeout(()=>setToast(null),1600); try{ document.getElementById('ldr-input')?.focus(); }catch{} window.scrollTo({top:0,behavior:'smooth'}); };
-  return (
-    <div className="tb-root min-h-screen bg-[#e8ceaa] text-[#5b2a17] relative overflow-x-hidden">
-      <style>{`
+// -------------------- Mobile Mode --------------------
+const [mobileMode, setMobileMode] = useState(
+  typeof window !== "undefined" && window.innerWidth < 500
+);
+
+// -------------------- Tests rapides (ne modifient rien à l'UI) --------------------
+useEffect(() => {
+  const A = computeAnchors(100, .5);
+  console.assert(Math.abs(A.BASE - 197.6) < .3, 'BASE math');
+
+  const p = parseNumber('12\u00A0500');
+  console.assert(p === 12500, 'NBSP parse');
+
+  const sgTest = computeSG(50000, { G5: true }, {});
+  console.assert(
+    sgTest && typeof sgTest.SR === 'number',
+    'computeSG returns'
+  );
+}, []);
+
+const reset = () => {
+  setLdrInput("");
+  setCalcMode("balanced");
+  setSelected(
+    Object.fromEntries(
+      [...GUARDSMEN, ...SPECIALISTS].map(k => [k, false])
+    )
+  );
+  setTypePicks({});
+  setMonsterFull(
+    Object.fromEntries(MON_GROUPS.map(k => [k, false]))
+  );
+  setEntryPicks({});
+  setShowTypePicks(false);
+  setShowEntryPicks(false);
+  setShowCalcs(false);
+  setBubble(null);
+  sfx.deselect();
+  setToast('Reset done');
+  setTimeout(() => setToast(null), 1600);
+
+  try {
+    document.getElementById('ldr-input')?.focus();
+  } catch {}
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+};
+
+return (
+  <div
+    className={`tb-root min-h-screen bg-[#e8ceaa] text-[#5b2a17] relative overflow-x-hidden ${
+      mobileMode ? 'mobile-mode' : ''
+    }`}
+  >
+    <style>{`
 /* =========================
    1) Animations
    ========================= */
@@ -1277,7 +1325,7 @@ body,
   font-size: clamp(1.25rem, 1.5vw, 1.5rem) !important;
 }
 /* =========================
-   10) Mobile fixes
+   10) Mobile Mode
    ========================= */
 html,
 body,
@@ -1285,7 +1333,6 @@ body,
   width: 100%;
   min-height: 100%;
   overflow-x: hidden;
-  font-size: 16px;
 }
 
 .tb-root {
@@ -1294,53 +1341,51 @@ body,
   overflow-x: hidden;
 }
 
-@media (max-width: 640px) {
-  .tb-root {
-    font-size: 16px;
-  }
+.mobile-mode {
+  font-size: 1.25rem;
+}
 
-  .tb-root h1 {
-    font-size: 1.15rem !important;
-    line-height: 1.2;
-  }
+.mobile-mode h1 {
+  font-size: 1.35rem !important;
+  line-height: 1.2;
+}
 
-  .tb-root h2 {
-    font-size: 1.15rem !important;
-  }
+.mobile-mode h2 {
+  font-size: 1.3rem !important;
+}
 
-  .tb-root h3 {
-    font-size: 1rem !important;
-  }
+.mobile-mode h3 {
+  font-size: 1.15rem !important;
+}
 
-  .tb-root button {
-    font-size: 1rem !important;
-  }
+.mobile-mode button {
+  font-size: 1.15rem !important;
+}
 
-  .tb-root input {
-    font-size: 1.4rem !important;
-  }
+.mobile-mode input {
+  font-size: 1.8rem !important;
+}
 
-  .tb-media th,
-  .tb-media td {
-    font-size: 1rem !important;
-  }
+.mobile-mode .tb-media th,
+.mobile-mode .tb-media td {
+  font-size: 1.2rem !important;
+}
 
-  .tb-media .unit img,
-  .tb-icon,
-  .tb-icon-sm {
-    width: 64px !important;
-    height: 64px !important;
-  }
+.mobile-mode .tb-media .unit img,
+.mobile-mode .tb-icon,
+.mobile-mode .tb-icon-sm {
+  width: 96px !important;
+  height: 96px !important;
+}
 
-  table {
-    table-layout: auto;
-    width: 100%;
-  }
+table {
+  table-layout: auto;
+  width: 100%;
+}
 
-  td,
-  th {
-    word-break: break-word;
-  }
+td,
+th {
+  word-break: break-word;
 }
 
 `}</style>
@@ -1366,30 +1411,43 @@ body,
                 <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#1f4318] border border-[#4d7139] text-[#f1debd] text-sm font-semibold leading-none">V0,8</span>
               </div>
 <div className="flex items-center gap-2">
- <button
-  type="button"
-  className="tb-close"
-  aria-label="Reset all"
-  title="Reset all"
-  onClick={reset}
->
-  <svg
-    className="w-6 h-6 pointer-events-none"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
+  <span className="text-[#f1debd] text-xs md:text-sm">
+    Mobile
+  </span>
+
+  <button
+    type="button"
+    role="switch"
+    aria-checked={mobileMode}
+    className={`tb-toggle ${mobileMode ? "on" : ""}`}
+    title="Mobile display mode"
+    onClick={() => setMobileMode(v => !v)}
   >
-    <path d="M16 3l5 5-5 5" />
-    <path d="M21 8a9 9 0 0 0-15-3" />
-    <path d="M8 21l-5-5 5-5" />
-    <path d="M3 16a9 9 0 0 0 15 3" />
-  </svg>
-</button>
+    <span className="tb-toggle-knob" />
+  </button>
 
-
+  <button
+    type="button"
+    className="tb-close"
+    aria-label="Reset all"
+    title="Reset all"
+    onClick={reset}
+  >
+    <svg
+      className="w-6 h-6 pointer-events-none"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 3l5 5-5 5" />
+      <path d="M21 8a9 9 0 0 0-15-3" />
+      <path d="M8 21l-5-5 5-5" />
+      <path d="M3 16a9 9 0 0 0 15 3" />
+    </svg>
+  </button>
 </div>
 
 

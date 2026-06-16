@@ -863,39 +863,17 @@ const sg = useMemo(
   [L, selected, picksSigSG, calcMode]
 );
 
-const sgRowsSorted = useMemo(() => {
-  const typeOrder = {
-    flying: 0,
-    mounted: 1,
-    melee: 2,
-    ranged: 3,
-    scout: 4,
-  };
-
-  const levelOrder = {
-    G9: 0,
-    S9: 1,
-    G8: 2,
-    S8: 3,
-    G7: 4,
-    S7: 5,
-    G6: 6,
-    S6: 7,
-    G5: 8,
-    S5: 9,
-    G4: 10,
-    S4: 11,
-    G3: 12,
-    S3: 13,
-    G2: 14,
-  };
-
-  return [...sg.rows].sort(
-    (a, b) =>
-      (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99) ||
-      (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99)
-  );
-}, [sg.rows, calcMode]);
+const sgRowsSorted = useMemo(
+  () =>
+    [...sg.rows].sort(
+      (a, b) =>
+        b.unitStrength - a.unitStrength ||
+        b.totalStrength - a.totalStrength ||
+        String(a.level).localeCompare(String(b.level)) ||
+        String(a.type).localeCompare(String(b.type))
+    ),
+  [sg.rows]
+);
 
 
 

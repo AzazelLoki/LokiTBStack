@@ -206,7 +206,7 @@ const ordered = [...chosen].sort((a, b) => {
 
 // Allocation approximative:
 // les premières unités dans ordered reçoivent une cible plus haute.
-const hedge = 0.995;
+const hedge = 1;
 
 const rows = ordered.map((u, i) => {
   const target = Math.max(0, Math.floor(baseT * Math.pow(hedge, i)));

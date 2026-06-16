@@ -882,17 +882,45 @@ export default function TBStackCalculator(){
       : computeSG(L, selected, typePicks),
     [L, selected, picksSigSG, calcMode]
   );
-  const sgRowsSorted = useMemo(
-    () =>
-      [...sg.rows].sort(
-        (a, b) =>
-          b.unitStrength - a.unitStrength ||
-          b.totalStrength - a.totalStrength ||
-          String(a.level).localeCompare(String(b.level)) ||
+const sgRowsSorted = useMemo(
+  () =>
+    [...sg.rows].sort((a, b) => {
+      // Mode Advanced: afficher Specialists avant Guardsmen,
+      // puis faibles/type I avant forts/type II
+      if (calcMode === "advanced") {
+        const aIsSpec = String(a.level).startsWith("S") ? 0 : 1;
+        const bIsSpec = String(b.level).startsWith("S") ? 0 : 1;
+
+        if (aIsSpec !== bIsSpec) {
+          return aIsSpec - bIsSpec;
+        }
+
+        const levelCompare = String(a.level).localeCompare(
+          String(b.level),
+          undefined,
+          { numeric: true }
+        );
+
+        if (levelCompare !== 0) {
+          return levelCompare;
+        }
+
+        return (
+          (a.unitStrength || 0) - (b.unitStrength || 0) ||
           String(a.type).localeCompare(String(b.type))
-      ),
-    [sg.rows]
-  );
+        );
+      }
+
+      // Mode Balanced: ancien affichage
+      return (
+        (b.unitStrength || 0) - (a.unitStrength || 0) ||
+        (b.totalStrength || 0) - (a.totalStrength || 0) ||
+        String(a.level).localeCompare(String(b.level)) ||
+        String(a.type).localeCompare(String(b.type))
+      );
+    }),
+  [sg.rows, calcMode]
+);
 
   const sgBuild = useMemo(() => {
     const make = (prefix) => {

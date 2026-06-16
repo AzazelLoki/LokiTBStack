@@ -186,37 +186,19 @@ const computeAdvancedSG = (leadership, selected, typePicks) => {
 // -------------------- Advanced Stack Ordering --------------------
 // Même ordre logique que Balanced HP
 const ordered = [...chosen].sort((a, b) => {
-  const typeOrder = {
-    flying: 0,
-    mounted: 1,
-    melee: 2,
-    ranged: 3,
-    scout: 4,
-  };
+  const aIsSpec = String(a.level).startsWith("S") ? 0 : 1;
+  const bIsSpec = String(b.level).startsWith("S") ? 0 : 1;
 
-  const levelOrder = {
-    G9: 0,
-    S9: 1,
-    G8: 2,
-    S8: 3,
-    G7: 4,
-    S7: 5,
-    G6: 6,
-    S6: 7,
-    G5: 8,
-    S5: 9,
-    G4: 10,
-    S4: 11,
-    G3: 12,
-    S3: 13,
-    G2: 14,
-  };
+  if (aIsSpec !== bIsSpec) return aIsSpec - bIsSpec;
 
-  return (
-    (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99) ||
-    (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99) ||
-    String(a.type).localeCompare(String(b.type))
-  );
+  const levelCompare = String(a.level).localeCompare(String(b.level), undefined, { numeric: true });
+  if (levelCompare !== 0) return levelCompare;
+
+  if (a.ratio !== b.ratio) return a.ratio - b.ratio;
+  if (a.effectiveStrength !== b.effectiveStrength) return a.effectiveStrength - b.effectiveStrength;
+  if (a.unitStrength !== b.unitStrength) return a.unitStrength - b.unitStrength;
+
+  return String(a.type).localeCompare(String(b.type));
 });
 
   const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);
@@ -878,17 +860,51 @@ const sg = useMemo(
   [L, selected, picksSigSG, calcMode]
 );
 
-const sgRowsSorted = useMemo(
-  () =>
-    [...sg.rows].sort(
+const sgRowsSorted = useMemo(() => {
+  const typeOrder = {
+    flying: 0,
+    mounted: 1,
+    melee: 2,
+    ranged: 3,
+    scout: 4,
+  };
+
+  const levelOrder = {
+    G9: 0,
+    S9: 1,
+    G8: 2,
+    S8: 3,
+    G7: 4,
+    S7: 5,
+    G6: 6,
+    S6: 7,
+    G5: 8,
+    S5: 9,
+    G4: 10,
+    S4: 11,
+    G3: 12,
+    S3: 13,
+    G2: 14,
+  };
+
+  if (calcMode === "advanced") {
+    return [...sg.rows].sort(
       (a, b) =>
-        b.unitStrength - a.unitStrength ||
-        b.totalStrength - a.totalStrength ||
-        String(a.level).localeCompare(String(b.level)) ||
-        String(a.type).localeCompare(String(b.type))
-    ),
-  [sg.rows]
-);
+        (typeOrder[a.type] ?? 99) -
+          (typeOrder[b.type] ?? 99) ||
+        (levelOrder[a.level] ?? 99) -
+          (levelOrder[b.level] ?? 99)
+    );
+  }
+
+  return [...sg.rows].sort(
+    (a, b) =>
+      b.unitStrength - a.unitStrength ||
+      b.totalStrength - a.totalStrength ||
+      String(a.level).localeCompare(String(b.level)) ||
+      String(a.type).localeCompare(String(b.type))
+  );
+}, [sg.rows, calcMode]);
 
 
 

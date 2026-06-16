@@ -1276,6 +1276,73 @@ body,
 .tb-media thead th {
   font-size: clamp(1.25rem, 1.5vw, 1.5rem) !important;
 }
+/* =========================
+   10) Mobile fixes
+   ========================= */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  font-size: 16px;
+}
+
+.tb-root {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+@media (max-width: 640px) {
+  .tb-root {
+    font-size: 16px;
+  }
+
+  .tb-root h1 {
+    font-size: 1.15rem !important;
+    line-height: 1.2;
+  }
+
+  .tb-root h2 {
+    font-size: 1.15rem !important;
+  }
+
+  .tb-root h3 {
+    font-size: 1rem !important;
+  }
+
+  .tb-root button {
+    font-size: 1rem !important;
+  }
+
+  .tb-root input {
+    font-size: 1.4rem !important;
+  }
+
+  .tb-media th,
+  .tb-media td {
+    font-size: 1rem !important;
+  }
+
+  .tb-media .unit img,
+  .tb-icon,
+  .tb-icon-sm {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  table {
+    table-layout: auto;
+    width: 100%;
+  }
+
+  td,
+  th {
+    word-break: break-word;
+  }
+}
+
 `}</style>
 
 {bubble && (

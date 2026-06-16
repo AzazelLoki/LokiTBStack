@@ -1072,7 +1072,7 @@ export default function TBStackCalculator(){
   },[]);
   const reset=()=>{ setLdrInput(""); setCalcMode("balanced"); setSelected(Object.fromEntries([...GUARDSMEN,...SPECIALISTS].map(k=>[k,false]))); setTypePicks({}); setMonsterFull(Object.fromEntries(MON_GROUPS.map(k=>[k,false]))); setEntryPicks({}); setShowTypePicks(false); setShowEntryPicks(false); setShowCalcs(false); setBubble(null); sfx.deselect(); setToast('Reset done'); setTimeout(()=>setToast(null),1600); try{ document.getElementById('ldr-input')?.focus(); }catch{} window.scrollTo({top:0,behavior:'smooth'}); };
   return (
-    <div className="tb-root min-h-screen bg-[#e8ceaa] text-[#5b2a17] relative overflow-x-hidden">
+    <div className="tb-root min-h-screen bg-[#e8ceaa] text-[#5b2a17] relative overflow-x-hidden overflow-y-auto">">
       <style>{`
 /* =========================
    1) Animations
@@ -1192,8 +1192,8 @@ export default function TBStackCalculator(){
 /* =========================
    7) Root / Scroll
    ========================= */
-.tb-root { scrollbar-width:none; overscroll-behavior:contain; }
-.tb-root::-webkit-scrollbar { width:0; height:0; }
+.tb-root { scrollbar-width: auto; overscroll-behavior: auto; overflow-y: auto; min-height: 100vh;}
+.tb-root::-webkit-scrollbar { width: 12px; height: 12px;}
 
 /* =========================
    8) Icônes / Images

@@ -890,22 +890,10 @@ const sgRowsSorted = useMemo(() => {
     G2: 14,
   };
 
-  if (calcMode === "advanced") {
-    return [...sg.rows].sort(
-      (a, b) =>
-        (typeOrder[a.type] ?? 99) -
-          (typeOrder[b.type] ?? 99) ||
-        (levelOrder[a.level] ?? 99) -
-          (levelOrder[b.level] ?? 99)
-    );
-  }
-
   return [...sg.rows].sort(
     (a, b) =>
-      b.unitStrength - a.unitStrength ||
-      b.totalStrength - a.totalStrength ||
-      String(a.level).localeCompare(String(b.level)) ||
-      String(a.type).localeCompare(String(b.type))
+      (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99) ||
+      (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99)
   );
 }, [sg.rows, calcMode]);
 

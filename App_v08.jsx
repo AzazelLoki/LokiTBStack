@@ -184,43 +184,39 @@ const computeAdvancedSG = (leadership, selected, typePicks) => {
   }
 
 // -------------------- Advanced Stack Ordering --------------------
+// Même ordre logique que Balanced HP
 const ordered = [...chosen].sort((a, b) => {
-  // 1. Specialists avant Guardsmen
-  const aIsSpec = String(a.level).startsWith("S") ? 0 : 1;
-  const bIsSpec = String(b.level).startsWith("S") ? 0 : 1;
+  const typeOrder = {
+    flying: 0,
+    mounted: 1,
+    melee: 2,
+    ranged: 3,
+    scout: 4,
+  };
 
-  if (aIsSpec !== bIsSpec) {
-    return aIsSpec - bIsSpec;
-  }
+  const levelOrder = {
+    G9: 0,
+    S9: 1,
+    G8: 2,
+    S8: 3,
+    G7: 4,
+    S7: 5,
+    G6: 6,
+    S6: 7,
+    G5: 8,
+    S5: 9,
+    G4: 10,
+    S4: 11,
+    G3: 12,
+    S3: 13,
+    G2: 14,
+  };
 
-  // 2. Niveau croissant dans le même groupe
-  const levelCompare = String(a.level).localeCompare(
-    String(b.level),
-    undefined,
-    { numeric: true }
+  return (
+    (typeOrder[a.type] ?? 99) - (typeOrder[b.type] ?? 99) ||
+    (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99) ||
+    String(a.type).localeCompare(String(b.type))
   );
-
-  if (levelCompare !== 0) {
-    return levelCompare;
-  }
-
-  // 3. Ratio faible en premier
-  if (a.ratio !== b.ratio) {
-    return a.ratio - b.ratio;
-  }
-
-  // 4. Effective strength faible en premier
-  if (a.effectiveStrength !== b.effectiveStrength) {
-    return a.effectiveStrength - b.effectiveStrength;
-  }
-
-  // 5. Strength faible en premier
-  if (a.unitStrength !== b.unitStrength) {
-    return a.unitStrength - b.unitStrength;
-  }
-
-  // 6. Type alphabétique
-  return String(a.type).localeCompare(String(b.type));
 });
 
   const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);

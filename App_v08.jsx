@@ -183,13 +183,37 @@ const computeAdvancedSG = (leadership, selected, typePicks) => {
     return { rows: [], used: 0, leftover: leadership, T: 0, SR: 0, advancedOrder: [] };
   }
 
-  const ordered = [...chosen].sort((a, b) =>
-    (b.ratio - a.ratio) ||
-    (b.effectiveStrength - a.effectiveStrength) ||
-    (b.unitStrength - a.unitStrength) ||
-    String(b.level).localeCompare(String(a.level)) ||
-    String(a.type).localeCompare(String(b.type))
+// -------------------- Advanced Stack Ordering --------------------
+const ordered = [...chosen].sort((a, b) => {
+  // 1. Ratio le plus faible en premier
+  if (a.ratio !== b.ratio) {
+    return a.ratio - b.ratio;
+  }
+
+  // 2. Effective strength la plus faible en premier
+  if (a.effectiveStrength !== b.effectiveStrength) {
+    return a.effectiveStrength - b.effectiveStrength;
+  }
+
+  // 3. Strength unitaire la plus faible en premier
+  if (a.unitStrength !== b.unitStrength) {
+    return a.unitStrength - b.unitStrength;
+  }
+
+  // 4. Niveau croissant
+  const levelCompare = String(a.level).localeCompare(
+    String(b.level),
+    undefined,
+    { numeric: true }
   );
+
+  if (levelCompare !== 0) {
+    return levelCompare;
+  }
+
+  // 5. Type alphabétique
+  return String(a.type).localeCompare(String(b.type));
+});
 
   const SR = ordered.reduce((a, u) => a + u.ldr / u.health, 0);
   const baseT = Math.floor(leadership / SR);

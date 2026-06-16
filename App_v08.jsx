@@ -290,6 +290,7 @@ return {
   SR,
   advancedOrder: ordered,
 };
+};
 // MONSTRES (group|type|strength|health|name)
     const MON_CSV = [
       "M3|ranged|1800|5700|Water Elemental",

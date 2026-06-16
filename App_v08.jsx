@@ -863,17 +863,37 @@ const sg = useMemo(
   [L, selected, picksSigSG, calcMode]
 );
 
-const sgRowsSorted = useMemo(
-  () =>
-    [...sg.rows].sort(
-      (a, b) =>
-        b.unitStrength - a.unitStrength ||
-        b.totalStrength - a.totalStrength ||
-        String(a.level).localeCompare(String(b.level)) ||
-        String(a.type).localeCompare(String(b.type))
-    ),
-  [sg.rows]
-);
+const sgRowsSorted = useMemo(() => {
+  const levelOrder = {
+    G9: 0,
+    S9: 1,
+    G8: 2,
+    S8: 3,
+    G7: 4,
+    S7: 5,
+    G6: 6,
+    S6: 7,
+    G5: 8,
+    S5: 9,
+    G4: 10,
+    S4: 11,
+    G3: 12,
+    S3: 13,
+    G2: 14,
+  };
+
+  return [...sg.rows].sort(
+    (a, b) =>
+      // Même logique visuelle que Balanced : force unitaire d'abord
+      (b.unitStrength || 0) - (a.unitStrength || 0) ||
+
+      // Si même force, ordre fixe G9, S9, G8, S8...
+      (levelOrder[a.level] ?? 99) - (levelOrder[b.level] ?? 99) ||
+
+      // Dernier tie-breaker
+      String(a.type).localeCompare(String(b.type))
+  );
+}, [sg.rows]);
 
 
 

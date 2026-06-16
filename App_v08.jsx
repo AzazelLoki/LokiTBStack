@@ -224,68 +224,28 @@ const rows = ordered.map((u, i) => {
 });
 
 let used = rows.reduce((a, r) => a + r.ldrUsed, 0);
-let leftover = leadership - used;
 
-// Remplit sans jamais dépasser
-const fillOrder = [...rows.keys()].sort((ia, ib) =>
-  (rows[ib].effectiveStrength || 0) - (rows[ia].effectiveStrength || 0) ||
-  (rows[ib].unitStrength || 0) - (rows[ia].unitStrength || 0)
-);
-
-let added = true;
-let safety = 0;
-
-while (added && safety < 100000) {
-  added = false;
-
-  for (const idx of fillOrder) {
-    const r = rows[idx];
-
-    if (leftover >= r.ldrUsed / Math.max(r.troops, 1) || leftover >= r.ldrUsed && r.troops === 0) {
-      const unitLdr = r.troops > 0 ? r.ldrUsed / r.troops : 1;
-
-      if (leftover >= unitLdr) {
-        r.troops += 1;
-        r.totalHealth += r.totalHealth / Math.max(r.troops - 1, 1);
-        r.totalStrength += r.unitStrength;
-        r.ldrUsed += unitLdr;
-
-        used += unitLdr;
-        leftover = leadership - used;
-        added = true;
-      }
-    }
-  }
-
-  safety++;
-}
-
-// Sécurité finale absolue
 while (used > leadership) {
   const idx = rows
-    .map((r, i) => ({ ...r, i }))
-    .filter(r => r.troops > 0)
+    .map((r, i) => ({ r, i }))
+    .filter(x => x.r.troops > 0)
     .sort((a, b) =>
-      (a.effectiveStrength || 0) - (b.effectiveStrength || 0) ||
-      (a.unitStrength || 0) - (b.unitStrength || 0)
+      (a.r.unitStrength || 0) - (b.r.unitStrength || 0)
     )[0]?.i;
 
   if (idx === undefined) break;
 
   const r = rows[idx];
-  const unitLdr = r.ldrUsed / r.troops;
-  const unitHealth = r.totalHealth / r.troops;
+  const def = DATA[r.level]?.find(u => u.type === r.type);
+  if (!def) break;
 
   r.troops -= 1;
-  r.totalHealth -= unitHealth;
+  r.totalHealth -= def.health;
   r.totalStrength -= r.unitStrength;
-  r.ldrUsed -= unitLdr;
+  r.ldrUsed -= def.ldr;
 
   used = rows.reduce((a, rr) => a + rr.ldrUsed, 0);
-  leftover = leadership - used;
 }
-
-used = rows.reduce((a, r) => a + r.ldrUsed, 0);
 
 return {
   rows,

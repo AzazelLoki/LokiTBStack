@@ -185,22 +185,15 @@ const computeAdvancedSG = (leadership, selected, typePicks) => {
 
 // -------------------- Advanced Stack Ordering --------------------
 const ordered = [...chosen].sort((a, b) => {
-  // 1. Ratio le plus faible en premier
-  if (a.ratio !== b.ratio) {
-    return a.ratio - b.ratio;
+  // 1. Specialists avant Guardsmen
+  const aIsSpec = String(a.level).startsWith("S") ? 0 : 1;
+  const bIsSpec = String(b.level).startsWith("S") ? 0 : 1;
+
+  if (aIsSpec !== bIsSpec) {
+    return aIsSpec - bIsSpec;
   }
 
-  // 2. Effective strength la plus faible en premier
-  if (a.effectiveStrength !== b.effectiveStrength) {
-    return a.effectiveStrength - b.effectiveStrength;
-  }
-
-  // 3. Strength unitaire la plus faible en premier
-  if (a.unitStrength !== b.unitStrength) {
-    return a.unitStrength - b.unitStrength;
-  }
-
-  // 4. Niveau croissant
+  // 2. Niveau croissant dans le même groupe
   const levelCompare = String(a.level).localeCompare(
     String(b.level),
     undefined,
@@ -211,7 +204,22 @@ const ordered = [...chosen].sort((a, b) => {
     return levelCompare;
   }
 
-  // 5. Type alphabétique
+  // 3. Ratio faible en premier
+  if (a.ratio !== b.ratio) {
+    return a.ratio - b.ratio;
+  }
+
+  // 4. Effective strength faible en premier
+  if (a.effectiveStrength !== b.effectiveStrength) {
+    return a.effectiveStrength - b.effectiveStrength;
+  }
+
+  // 5. Strength faible en premier
+  if (a.unitStrength !== b.unitStrength) {
+    return a.unitStrength - b.unitStrength;
+  }
+
+  // 6. Type alphabétique
   return String(a.type).localeCompare(String(b.type));
 });
 

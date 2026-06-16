@@ -1998,7 +1998,7 @@ body,
 
 
         
-      {/* LØKI */}
+      {/* LØKI / WELAWYN */}
       <div className="fixed bottom-4 right-4 z-[60] select-none">
         <div className="tb-chip text-sm md:text-base tracking-widest font-bold"><span className="tb-gold tb-sparkle"> LØKI </span></div>
       </div>

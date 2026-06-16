@@ -1342,52 +1342,70 @@ body,
 }
 
 .mobile-mode {
-  font-size: 1.25rem;
+  font-size: 1.35rem !important;
+}
+
+.mobile-mode * {
+  line-height: 1.25 !important;
 }
 
 .mobile-mode h1 {
-  font-size: 1.35rem !important;
-  line-height: 1.2;
+  font-size: 1.55rem !important;
 }
 
 .mobile-mode h2 {
-  font-size: 1.3rem !important;
+  font-size: 1.45rem !important;
 }
 
 .mobile-mode h3 {
+  font-size: 1.3rem !important;
+}
+
+.mobile-mode span,
+.mobile-mode div,
+.mobile-mode p,
+.mobile-mode li {
   font-size: 1.15rem !important;
 }
 
 .mobile-mode button {
-  font-size: 1.15rem !important;
+  font-size: 1.25rem !important;
+  padding-top: 0.9rem !important;
+  padding-bottom: 0.9rem !important;
 }
 
 .mobile-mode input {
-  font-size: 1.8rem !important;
+  font-size: 2rem !important;
+  padding-top: 1.1rem !important;
+  padding-bottom: 1.1rem !important;
 }
 
 .mobile-mode .tb-media th,
 .mobile-mode .tb-media td {
-  font-size: 1.2rem !important;
+  font-size: 1.35rem !important;
+  padding: 0.8rem !important;
 }
 
-.mobile-mode .tb-media .unit img,
 .mobile-mode .tb-icon,
-.mobile-mode .tb-icon-sm {
-  width: 96px !important;
-  height: 96px !important;
+.mobile-mode .tb-icon-sm,
+.mobile-mode .tb-media .unit img {
+  width: 112px !important;
+  height: 112px !important;
 }
 
-table {
+.mobile-mode .max-w-6xl {
+  max-width: 100% !important;
+}
+
+.mobile-mode table {
   table-layout: auto;
   width: 100%;
 }
 
-td,
-th {
+.mobile-mode td,
+.mobile-mode th {
   word-break: break-word;
 }
-
 `}</style>
 
 {bubble && (
